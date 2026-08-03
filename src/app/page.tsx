@@ -25,6 +25,8 @@ export default function HomePage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [totalPoints, setTotalPoints] = useState(0);
   const [newTask, setNewTask] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
   const [isRest, setIsRest] = useState(false);
   const [workHours, setWorkHours] = useState("");
   const [workMinutes, setWorkMinutes] = useState("");
@@ -118,6 +120,34 @@ export default function HomePage() {
     }
   }
 
+  async function deleteTask(taskId: string, wasDone: boolean) {
+    const { error } = await supabase
+      .from("daily_tasks")
+      .delete()
+      .eq("id", taskId);
+
+    if (!error) {
+      setTasks((prev) => prev.filter((t) => t.id !== taskId));
+      if (wasDone) setTotalPoints((prev) => prev - 1);
+    }
+  }
+
+  async function updateTask(taskId: string) {
+    if (!editText.trim()) return;
+    const { error } = await supabase
+      .from("daily_tasks")
+      .update({ task_text: editText.trim() })
+      .eq("id", taskId);
+
+    if (!error) {
+      setTasks((prev) =>
+        prev.map((t) => (t.id === taskId ? { ...t, task_text: editText.trim() } : t))
+      );
+      setEditingId(null);
+      setEditText("");
+    }
+  }
+
   async function toggleRest() {
     if (isRest) {
       await supabase
@@ -203,9 +233,9 @@ export default function HomePage() {
           <p className="text-sm text-gray-400">タスクがまだありません</p>
         )}
         {tasks.map((task) => (
-          <label
+          <div
             key={task.id}
-            className="flex items-center gap-3 rounded border border-gray-200 px-3 py-2 cursor-pointer hover:bg-gray-50"
+            className="flex items-center gap-3 rounded border border-gray-200 px-3 py-2 hover:bg-gray-50"
           >
             <input
               type="checkbox"
@@ -213,12 +243,43 @@ export default function HomePage() {
               onChange={() => toggleTask(task.id, task.done)}
               className="h-5 w-5 min-w-[20px] accent-green-600 cursor-pointer"
             />
-            <span
-              className={`text-sm ${task.done ? "line-through text-gray-400" : ""}`}
-            >
-              {task.task_text}
-            </span>
-          </label>
+            {editingId === task.id ? (
+              <form
+                onSubmit={(e) => { e.preventDefault(); updateTask(task.id); }}
+                className="flex flex-1 gap-2"
+              >
+                <input
+                  type="text"
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  autoFocus
+                  className="flex-1 rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
+                />
+                <button type="submit" className="text-xs text-blue-600 hover:underline">保存</button>
+                <button type="button" onClick={() => setEditingId(null)} className="text-xs text-gray-400 hover:underline">取消</button>
+              </form>
+            ) : (
+              <>
+                <span
+                  className={`flex-1 text-sm ${task.done ? "line-through text-gray-400" : ""}`}
+                >
+                  {task.task_text}
+                </span>
+                <button
+                  onClick={() => { setEditingId(task.id); setEditText(task.task_text); }}
+                  className="text-xs text-gray-400 hover:text-blue-600"
+                >
+                  編集
+                </button>
+                <button
+                  onClick={() => deleteTask(task.id, task.done)}
+                  className="text-xs text-gray-400 hover:text-red-600"
+                >
+                  削除
+                </button>
+              </>
+            )}
+          </div>
         ))}
       </div>
 
