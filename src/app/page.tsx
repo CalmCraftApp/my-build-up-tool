@@ -11,6 +11,11 @@ type Task = {
   done: boolean;
 };
 
+type Title = {
+  id: string;
+  title: string;
+};
+
 type WorkHoursRecord = {
   work_hours_part: number | null;
   work_minutes_part: number | null;
@@ -27,6 +32,10 @@ export default function HomePage() {
   const [newTask, setNewTask] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+  const [titles, setTitles] = useState<Title[]>([]);
+  const [newTitle, setNewTitle] = useState("");
+  const [editingTitleId, setEditingTitleId] = useState<string | null>(null);
+  const [editTitleText, setEditTitleText] = useState("");
   const [isRest, setIsRest] = useState(false);
   const [workHours, setWorkHours] = useState("");
   const [workMinutes, setWorkMinutes] = useState("");
@@ -34,7 +43,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
-    const [tasksRes, pointsRes, restRes, workRes] = await Promise.all([
+    const [tasksRes, pointsRes, restRes, workRes, titlesRes] = await Promise.all([
       supabase
         .from("daily_tasks")
         .select("id, task_text, done")
@@ -53,10 +62,16 @@ export default function HomePage() {
         .select("work_hours_part, work_minutes_part, comment")
         .eq("date_jst", selectedDate)
         .single(),
+      supabase
+        .from("daily_titles")
+        .select("id, title")
+        .eq("date_jst", selectedDate)
+        .order("created_at", { ascending: true }),
     ]);
 
     setTasks(tasksRes.data ?? []);
     setTotalPoints(pointsRes.count ?? 0);
+    setTitles(titlesRes.data ?? []);
     setIsRest((restRes.data ?? []).length > 0);
 
     if (workRes.data) {
@@ -76,6 +91,7 @@ export default function HomePage() {
   function changeDate(date: string) {
     setSelectedDate(date);
     setTasks([]);
+    setTitles([]);
     setIsRest(false);
     setWorkHours("");
     setWorkMinutes("");
@@ -148,6 +164,51 @@ export default function HomePage() {
     }
   }
 
+  async function addTitle(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newTitle.trim()) return;
+
+    const { data } = await supabase
+      .from("daily_titles")
+      .insert({ date_jst: selectedDate, title: newTitle.trim() })
+      .select("id, title")
+      .single();
+
+    if (data) {
+      setTitles((prev) => [...prev, data]);
+      setNewTitle("");
+    }
+  }
+
+  async function deleteTitle(titleId: string) {
+    const { error } = await supabase
+      .from("daily_titles")
+      .delete()
+      .eq("id", titleId);
+
+    if (!error) {
+      setTitles((prev) => prev.filter((t) => t.id !== titleId));
+    }
+  }
+
+  async function updateTitle(titleId: string) {
+    if (!editTitleText.trim()) return;
+    const { error } = await supabase
+      .from("daily_titles")
+      .update({ title: editTitleText.trim() })
+      .eq("id", titleId);
+
+    if (!error) {
+      setTitles((prev) =>
+        prev.map((t) =>
+          t.id === titleId ? { ...t, title: editTitleText.trim() } : t
+        )
+      );
+      setEditingTitleId(null);
+      setEditTitleText("");
+    }
+  }
+
   async function toggleRest() {
     if (isRest) {
       await supabase
@@ -211,24 +272,84 @@ export default function HomePage() {
         <span className="text-3xl font-bold">累計 {totalPoints}pt</span>
       </div>
 
+      <div className="flex items-center gap-3">
+        <h2 className="text-lg font-bold">{formatDateJST(selectedDate)}</h2>
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => changeDate(e.target.value)}
+          className="rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
+        />
+        {selectedDate !== today && (
+          <button
+            onClick={() => changeDate(today)}
+            className="text-xs text-blue-600 hover:underline"
+          >
+            今日に戻す
+          </button>
+        )}
+      </div>
+
       <div className="space-y-2">
-        <div className="flex items-center gap-3">
-          <h2 className="text-lg font-bold">{formatDateJST(selectedDate)} のタスク</h2>
+        <h3 className="text-sm font-bold">日のタイトル</h3>
+        {titles.map((t) => (
+          <div
+            key={t.id}
+            className="flex items-center gap-3 rounded border border-gray-200 px-3 py-2 hover:bg-gray-50"
+          >
+            {editingTitleId === t.id ? (
+              <form
+                onSubmit={(e) => { e.preventDefault(); updateTitle(t.id); }}
+                className="flex flex-1 gap-2"
+              >
+                <input
+                  type="text"
+                  value={editTitleText}
+                  onChange={(e) => setEditTitleText(e.target.value)}
+                  autoFocus
+                  className="flex-1 rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
+                />
+                <button type="submit" className="text-xs text-blue-600 hover:underline">保存</button>
+                <button type="button" onClick={() => setEditingTitleId(null)} className="text-xs text-gray-400 hover:underline">取消</button>
+              </form>
+            ) : (
+              <>
+                <span className="flex-1 text-sm font-medium">{t.title}</span>
+                <button
+                  onClick={() => { setEditingTitleId(t.id); setEditTitleText(t.title); }}
+                  className="text-xs text-gray-400 hover:text-blue-600"
+                >
+                  編集
+                </button>
+                <button
+                  onClick={() => deleteTitle(t.id)}
+                  className="text-xs text-gray-400 hover:text-red-600"
+                >
+                  削除
+                </button>
+              </>
+            )}
+          </div>
+        ))}
+        <form onSubmit={addTitle} className="flex gap-2">
           <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => changeDate(e.target.value)}
-            className="rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
+            type="text"
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
+            placeholder="今日やること..."
+            className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
           />
-          {selectedDate !== today && (
-            <button
-              onClick={() => changeDate(today)}
-              className="text-xs text-blue-600 hover:underline"
-            >
-              今日に戻す
-            </button>
-          )}
-        </div>
+          <button
+            type="submit"
+            className="rounded bg-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 whitespace-nowrap"
+          >
+            追加
+          </button>
+        </form>
+      </div>
+
+      <div className="space-y-2">
+        <h3 className="text-sm font-bold">タスク</h3>
         {tasks.length === 0 && (
           <p className="text-sm text-gray-400">タスクがまだありません</p>
         )}
@@ -281,6 +402,21 @@ export default function HomePage() {
             )}
           </div>
         ))}
+        <form onSubmit={addTask} className="flex gap-2">
+          <input
+            type="text"
+            value={newTask}
+            onChange={(e) => setNewTask(e.target.value)}
+            placeholder="新しいタスクを入力..."
+            className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+          />
+          <button
+            type="submit"
+            className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 whitespace-nowrap"
+          >
+            追加
+          </button>
+        </form>
       </div>
 
       <button
@@ -293,22 +429,6 @@ export default function HomePage() {
       >
         {isRest ? "休みを解除する" : "今日は休みにする"}
       </button>
-
-      <form onSubmit={addTask} className="flex gap-2">
-        <input
-          type="text"
-          value={newTask}
-          onChange={(e) => setNewTask(e.target.value)}
-          placeholder="新しいタスクを入力..."
-          className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-        />
-        <button
-          type="submit"
-          className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 whitespace-nowrap"
-        >
-          追加
-        </button>
-      </form>
 
       <div className="space-y-3 rounded border border-gray-200 p-4">
         <h3 className="text-sm font-bold">作業時間</h3>

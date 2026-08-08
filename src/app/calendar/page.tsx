@@ -11,9 +11,16 @@ type Task = {
   date_jst: string;
 };
 
+type Title = {
+  id: string;
+  title: string;
+  date_jst: string;
+};
+
 type DayBlock = {
   date: string;
   tasks: Task[];
+  titles: Title[];
   isRest: boolean;
   workHours: number | null;
   workMinutes: number | null;
@@ -45,7 +52,7 @@ export default function CalendarPage() {
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
-    const [tasksRes, restRes, workRes] = await Promise.all([
+    const [tasksRes, restRes, workRes, titlesRes] = await Promise.all([
       supabase
         .from("daily_tasks")
         .select("id, task_text, done, date_jst")
@@ -59,6 +66,11 @@ export default function CalendarPage() {
         .from("work_hours")
         .select("date_jst, work_hours_part, work_minutes_part, comment")
         .gte("date_jst", START_DATE),
+      supabase
+        .from("daily_titles")
+        .select("id, title, date_jst")
+        .gte("date_jst", START_DATE)
+        .order("created_at", { ascending: true }),
     ]);
 
     const tasksByDate: Record<string, Task[]> = {};
@@ -68,6 +80,12 @@ export default function CalendarPage() {
     }
 
     const restSet = new Set((restRes.data ?? []).map((r) => r.date_jst));
+
+    const titlesByDate: Record<string, Title[]> = {};
+    for (const t of titlesRes.data ?? []) {
+      if (!titlesByDate[t.date_jst]) titlesByDate[t.date_jst] = [];
+      titlesByDate[t.date_jst].push(t);
+    }
 
     const workByDate: Record<
       string,
@@ -86,14 +104,16 @@ export default function CalendarPage() {
 
     for (const date of allDates) {
       const tasks = tasksByDate[date] ?? [];
+      const titles = titlesByDate[date] ?? [];
       const isRest = restSet.has(date);
       const work = workByDate[date];
 
-      if (tasks.length === 0 && !isRest && !work) continue;
+      if (tasks.length === 0 && titles.length === 0 && !isRest && !work) continue;
 
       blocks.push({
         date,
         tasks,
+        titles,
         isRest,
         workHours: work?.h ?? null,
         workMinutes: work?.m ?? null,
@@ -186,6 +206,11 @@ export default function CalendarPage() {
               </p>
             ) : (
               <div className="space-y-1">
+                {day.titles.map((title) => (
+                  <p key={title.id} className="text-sm font-bold text-gray-700">
+                    {title.title}
+                  </p>
+                ))}
                 {day.tasks.map((task) => (
                   <div
                     key={task.id}
