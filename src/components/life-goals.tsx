@@ -38,8 +38,8 @@ export function LifeGoals() {
           <section>
             <h3 className="font-bold mb-1">【日々やること】</h3>
             <ul className="list-disc list-inside space-y-1 text-gray-800">
-              <li>マイクロSaasは10日で1つ完成(SNSの1投稿を含む)</li>
-              <li>HSP×稼ぐ系は週最低3回のX・Threads投稿</li>
+              <li>マイクロSaasは5日で1つ完成(SNSの1投稿を含む)</li>
+              <li>HSP×稼ぐ系は週最低6回のX・Threads投稿</li>
             </ul>
           </section>
 
