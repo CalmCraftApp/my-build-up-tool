@@ -88,3 +88,8 @@ create table daily_checklist (
   created_at timestamptz not null default now(),
   unique (date_jst, item_key)
 );
+
+-- Supabase の Table Editor で作ったテーブルは RLS がデフォルトで ON になる。
+-- このテーブルはポリシーを持たないため、ON のままだと select が常に空・upsert が
+-- 42501 で失敗する(= チェックしても ✕ のまま)。明示的に OFF にする。
+alter table daily_checklist disable row level security;

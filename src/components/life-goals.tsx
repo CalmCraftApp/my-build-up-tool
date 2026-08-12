@@ -36,38 +36,6 @@ export function LifeGoals() {
             <li>とにかく行動。試行回数を増やし、考えながら続ける</li>
           </ul>
         </section>
-
-        <section>
-          <h3 className="font-bold mb-2">note(HSP×稼ぐ系、X/Threads発信含む)</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-gray-300">
-                  <th className="py-1 pr-4 font-bold">時期</th>
-                  <th className="py-1 font-bold">ベースケース</th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-700">
-                <tr className="border-b border-gray-100">
-                  <td className="py-1 pr-4">3ヶ月後</td>
-                  <td className="py-1">1,000〜3,000円</td>
-                </tr>
-                <tr className="border-b border-gray-100">
-                  <td className="py-1 pr-4">6ヶ月後</td>
-                  <td className="py-1">3,000〜7,000円</td>
-                </tr>
-                <tr className="border-b border-gray-100">
-                  <td className="py-1 pr-4">9ヶ月後</td>
-                  <td className="py-1">5,000〜13,000円</td>
-                </tr>
-                <tr>
-                  <td className="py-1 pr-4">12ヶ月後</td>
-                  <td className="py-1">12,000〜20,000円</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
       </div>
     </div>
   );

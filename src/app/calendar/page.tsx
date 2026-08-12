@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { formatDateJST, getTodayJST } from "@/lib/date-utils";
-import { CHECKLIST_ITEMS } from "@/lib/checklist-items";
+import { CHECKLIST_ITEMS, CHECKLIST_START_DATE } from "@/lib/checklist-items";
 
 type Task = {
   id: string;
@@ -251,7 +251,7 @@ export default function CalendarPage() {
               </div>
             )}
 
-            {!day.isRest && (
+            {!day.isRest && day.date >= CHECKLIST_START_DATE && (
               <div className="mt-2 space-y-1">
                 {CHECKLIST_ITEMS.map((item) => {
                   const checked = day.checklist[item.key] ?? false;
