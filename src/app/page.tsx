@@ -469,10 +469,12 @@ export default function HomePage() {
                 <div
                   key={item.key}
                   onClick={() => toggleChecklistItem(item.key)}
-                  className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-gray-50"
+                  className={`flex items-center gap-3 px-3 py-2 cursor-pointer ${
+                    checked ? "bg-green-50 hover:bg-green-100" : "hover:bg-gray-50"
+                  }`}
                 >
                   <span
-                    className={`text-base font-bold min-w-[20px] text-center ${
+                    className={`text-2xl font-bold min-w-[20px] text-center ${
                       checked ? "text-green-500" : "text-gray-400"
                     }`}
                   >
