@@ -75,3 +75,16 @@ create policy "Users can insert own work hours"
 create policy "Users can update own work hours"
   on work_hours for update
   using (auth.uid() = user_id);
+
+-- daily_checklist
+-- 注: このアプリはログイン機能がなく auth.uid() は常にNULLのため、
+-- user_id / RLSは付けていない(daily_tasks等の user_id も実際は未使用)。
+create table daily_checklist (
+  id uuid primary key default gen_random_uuid(),
+  date_jst date not null,
+  item_key text not null,
+  checked boolean not null default false,
+  checked_at timestamptz,
+  created_at timestamptz not null default now(),
+  unique (date_jst, item_key)
+);

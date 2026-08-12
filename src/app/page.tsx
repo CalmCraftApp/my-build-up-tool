@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { getTodayJST, formatDateJST } from "@/lib/date-utils";
 import { LifeGoals } from "@/components/life-goals";
+import { CHECKLIST_ITEMS } from "@/lib/checklist-items";
 
 type Task = {
   id: string;
@@ -32,6 +33,7 @@ export default function HomePage() {
   const [newTask, setNewTask] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+  const [checklist, setChecklist] = useState<Record<string, boolean>>({});
   const [titles, setTitles] = useState<Title[]>([]);
   const [newTitle, setNewTitle] = useState("");
   const [editingTitleId, setEditingTitleId] = useState<string | null>(null);
@@ -43,7 +45,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
-    const [tasksRes, pointsRes, restRes, workRes, titlesRes] = await Promise.all([
+    const [tasksRes, pointsRes, restRes, workRes, titlesRes, checklistRes] = await Promise.all([
       supabase
         .from("daily_tasks")
         .select("id, task_text, done")
@@ -67,12 +69,21 @@ export default function HomePage() {
         .select("id, title")
         .eq("date_jst", selectedDate)
         .order("created_at", { ascending: true }),
+      supabase
+        .from("daily_checklist")
+        .select("item_key, checked")
+        .eq("date_jst", selectedDate),
     ]);
 
     setTasks(tasksRes.data ?? []);
     setTotalPoints(pointsRes.count ?? 0);
     setTitles(titlesRes.data ?? []);
     setIsRest((restRes.data ?? []).length > 0);
+
+    const checklistMap: Record<string, boolean> = {};
+    for (const item of CHECKLIST_ITEMS) checklistMap[item.key] = false;
+    for (const row of checklistRes.data ?? []) checklistMap[row.item_key] = row.checked;
+    setChecklist(checklistMap);
 
     if (workRes.data) {
       const wh = workRes.data as WorkHoursRecord;
@@ -92,6 +103,7 @@ export default function HomePage() {
     setSelectedDate(date);
     setTasks([]);
     setTitles([]);
+    setChecklist({});
     setIsRest(false);
     setWorkHours("");
     setWorkMinutes("");
@@ -133,6 +145,23 @@ export default function HomePage() {
         prev.map((t) => (t.id === taskId ? { ...t, done: newDone } : t))
       );
       setTotalPoints((prev) => prev + (newDone ? 1 : -1));
+    }
+  }
+
+  async function toggleChecklistItem(itemKey: string) {
+    const newChecked = !checklist[itemKey];
+    const { error } = await supabase.from("daily_checklist").upsert(
+      {
+        date_jst: selectedDate,
+        item_key: itemKey,
+        checked: newChecked,
+        checked_at: newChecked ? new Date().toISOString() : null,
+      },
+      { onConflict: "date_jst,item_key" }
+    );
+
+    if (!error) {
+      setChecklist((prev) => ({ ...prev, [itemKey]: newChecked }));
     }
   }
 
@@ -417,6 +446,31 @@ export default function HomePage() {
             追加
           </button>
         </form>
+      </div>
+
+      <div className="space-y-2">
+        <h3 className="text-sm font-bold">毎日チェックリスト</h3>
+        <div className="rounded border border-gray-200 divide-y divide-gray-100">
+          {CHECKLIST_ITEMS.map((item) => {
+            const checked = checklist[item.key] ?? false;
+            return (
+              <div
+                key={item.key}
+                onClick={() => toggleChecklistItem(item.key)}
+                className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-gray-50"
+              >
+                <span
+                  className={`text-base font-bold min-w-[20px] text-center ${
+                    checked ? "text-green-500" : "text-gray-400"
+                  }`}
+                >
+                  {checked ? "○" : "✕"}
+                </span>
+                <span className="flex-1 text-sm">{item.label}</span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <button

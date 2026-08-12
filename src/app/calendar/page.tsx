@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { formatDateJST, getTodayJST } from "@/lib/date-utils";
+import { CHECKLIST_ITEMS } from "@/lib/checklist-items";
 
 type Task = {
   id: string;
@@ -21,6 +22,7 @@ type DayBlock = {
   date: string;
   tasks: Task[];
   titles: Title[];
+  checklist: Record<string, boolean>;
   isRest: boolean;
   workHours: number | null;
   workMinutes: number | null;
@@ -52,7 +54,7 @@ export default function CalendarPage() {
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
-    const [tasksRes, restRes, workRes, titlesRes] = await Promise.all([
+    const [tasksRes, restRes, workRes, titlesRes, checklistRes] = await Promise.all([
       supabase
         .from("daily_tasks")
         .select("id, task_text, done, date_jst")
@@ -71,6 +73,10 @@ export default function CalendarPage() {
         .select("id, title, date_jst")
         .gte("date_jst", START_DATE)
         .order("created_at", { ascending: true }),
+      supabase
+        .from("daily_checklist")
+        .select("date_jst, item_key, checked")
+        .gte("date_jst", START_DATE),
     ]);
 
     const tasksByDate: Record<string, Task[]> = {};
@@ -99,21 +105,36 @@ export default function CalendarPage() {
       };
     }
 
+    const checklistByDate: Record<string, Record<string, boolean>> = {};
+    for (const row of checklistRes.data ?? []) {
+      if (!checklistByDate[row.date_jst]) checklistByDate[row.date_jst] = {};
+      checklistByDate[row.date_jst][row.item_key] = row.checked;
+    }
+
     const allDates = getDatesFromStartToToday();
     const blocks: DayBlock[] = [];
 
     for (const date of allDates) {
       const tasks = tasksByDate[date] ?? [];
       const titles = titlesByDate[date] ?? [];
+      const checklist = checklistByDate[date] ?? {};
       const isRest = restSet.has(date);
       const work = workByDate[date];
 
-      if (tasks.length === 0 && titles.length === 0 && !isRest && !work) continue;
+      if (
+        tasks.length === 0 &&
+        titles.length === 0 &&
+        Object.keys(checklist).length === 0 &&
+        !isRest &&
+        !work
+      )
+        continue;
 
       blocks.push({
         date,
         tasks,
         titles,
+        checklist,
         isRest,
         workHours: work?.h ?? null,
         workMinutes: work?.m ?? null,
@@ -227,6 +248,26 @@ export default function CalendarPage() {
                     <span className="text-sm">{task.task_text}</span>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {!day.isRest && (
+              <div className="mt-2 space-y-1">
+                {CHECKLIST_ITEMS.map((item) => {
+                  const checked = day.checklist[item.key] ?? false;
+                  return (
+                    <div key={item.key} className="flex items-center gap-2">
+                      <span
+                        className={`text-sm font-bold min-w-[20px] text-center ${
+                          checked ? "text-green-500" : "text-gray-400"
+                        }`}
+                      >
+                        {checked ? "○" : "✕"}
+                      </span>
+                      <span className="text-xs text-gray-600">{item.label}</span>
+                    </div>
+                  );
+                })}
               </div>
             )}
 
