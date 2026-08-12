@@ -448,6 +448,17 @@ export default function HomePage() {
         </form>
       </div>
 
+      <button
+        onClick={toggleRest}
+        className={`w-full rounded py-2 text-sm font-medium ${
+          isRest
+            ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            : "border border-gray-300 text-gray-600 hover:bg-gray-50"
+        }`}
+      >
+        {isRest ? "休みを解除する" : "今日は休みにする"}
+      </button>
+
       {selectedDate >= CHECKLIST_START_DATE && (
         <div className="space-y-2">
           <h3 className="text-sm font-bold">毎日チェックリスト</h3>
@@ -474,17 +485,6 @@ export default function HomePage() {
           </div>
         </div>
       )}
-
-      <button
-        onClick={toggleRest}
-        className={`w-full rounded py-2 text-sm font-medium ${
-          isRest
-            ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            : "border border-gray-300 text-gray-600 hover:bg-gray-50"
-        }`}
-      >
-        {isRest ? "休みを解除する" : "今日は休みにする"}
-      </button>
 
       <div className="space-y-3 rounded border border-gray-200 p-4">
         <h3 className="text-sm font-bold">作業時間</h3>
