@@ -475,7 +475,7 @@ export default function HomePage() {
                 >
                   <span
                     className={`text-2xl font-bold min-w-[20px] text-center ${
-                      checked ? "text-green-500" : "text-gray-400"
+                      checked ? "text-green-500 md:text-4xl" : "text-gray-400"
                     }`}
                   >
                     {checked ? "○" : "✕"}

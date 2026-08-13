@@ -259,7 +259,7 @@ export default function CalendarPage() {
                     <div key={item.key} className="flex items-center gap-2">
                       <span
                         className={`text-sm font-bold min-w-[20px] text-center ${
-                          checked ? "text-green-500" : "text-gray-400"
+                          checked ? "text-green-500 md:text-lg" : "text-gray-400"
                         }`}
                       >
                         {checked ? "○" : "✕"}
