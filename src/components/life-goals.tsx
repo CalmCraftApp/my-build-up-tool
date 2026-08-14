@@ -24,8 +24,34 @@ export function LifeGoals() {
         <section>
           <h3 className="font-bold mb-1">【日々やること】</h3>
           <ul className="list-disc list-inside space-y-1 text-gray-800">
-            <li>マイクロSaasは5日で1つ完成(SNSの1投稿を含む)</li>
+            <li>マイクロSaasは5日で1つ完成(SNSの3投稿を含む)</li>
             <li>HSP×稼ぐ系は週最低6回のX・Threads投稿</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3 className="font-bold mb-1">【マイクロSaasマーケティング方針】</h3>
+          <ul className="list-disc list-inside space-y-1 text-gray-800">
+            <li>
+              マイクロSaaSを1つ作るごとに、顧客の切り口(「〇〇で困ってる人へ」)に合わせてSNS発信する
+              <ul className="list-none pl-4 space-y-1">
+                <li>→投稿先:X、Instagram、YouTube、noteの4媒体に同じ動画を展開</li>
+                <li>→まず3本作って様子見る</li>
+                <li>→SNS上に実績となる動画が溢れている状態を作るのが軸</li>
+              </ul>
+            </li>
+            <li>各マイクロSaasごとにLPもClaude Codeに作らせて掲載</li>
+            <li>YouTubeの概要欄などから、個別受託用のLPにも誘導できる導線を作る(個別で作ります、という案内)</li>
+            <li>1つ反応があったら(基準は課金)、そこにできるだけ集中する</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3 className="font-bold mb-1">【HSP×稼ぐ系マーケティング方針】</h3>
+          <ul className="list-disc list-inside space-y-1 text-gray-800">
+            <li>読み手の立場に立って投稿</li>
+            <li>とにかく投稿しないと何も始まらない</li>
+            <li>コメントする</li>
           </ul>
         </section>
 

@@ -251,7 +251,7 @@ export default function CalendarPage() {
               </div>
             )}
 
-            {!day.isRest && day.date >= CHECKLIST_START_DATE && (
+            {day.date >= CHECKLIST_START_DATE && (
               <div className="mt-2 space-y-1">
                 {CHECKLIST_ITEMS.map((item) => {
                   const checked = day.checklist[item.key] ?? false;
@@ -281,7 +281,7 @@ export default function CalendarPage() {
                 </p>
               )}
 
-            {!day.isRest && day.comment && (
+            {day.comment && (
               <p className="text-xs text-gray-600 mt-1">{day.comment}</p>
             )}
           </div>
