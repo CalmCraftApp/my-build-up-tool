@@ -47,30 +47,30 @@ export default function HomePage() {
   const fetchData = useCallback(async () => {
     const [tasksRes, pointsRes, restRes, workRes, titlesRes, checklistRes] = await Promise.all([
       supabase
-        .from("daily_tasks")
+        .from("my_build_up_tool_daily_tasks")
         .select("id, task_text, done")
         .eq("date_jst", selectedDate)
         .order("created_at", { ascending: true }),
       supabase
-        .from("daily_tasks")
+        .from("my_build_up_tool_daily_tasks")
         .select("id", { count: "exact" })
         .eq("done", true),
       supabase
-        .from("rest_days")
+        .from("my_build_up_tool_rest_days")
         .select("id")
         .eq("date_jst", selectedDate),
       supabase
-        .from("work_hours")
+        .from("my_build_up_tool_work_hours")
         .select("work_hours_part, work_minutes_part, comment")
         .eq("date_jst", selectedDate)
         .single(),
       supabase
-        .from("daily_titles")
+        .from("my_build_up_tool_daily_titles")
         .select("id, title")
         .eq("date_jst", selectedDate)
         .order("created_at", { ascending: true }),
       supabase
-        .from("daily_checklist")
+        .from("my_build_up_tool_daily_checklist")
         .select("item_key, checked")
         .eq("date_jst", selectedDate),
     ]);
@@ -116,7 +116,7 @@ export default function HomePage() {
     if (!newTask.trim()) return;
 
     const { data } = await supabase
-      .from("daily_tasks")
+      .from("my_build_up_tool_daily_tasks")
       .insert({
         date_jst: selectedDate,
         task_text: newTask.trim(),
@@ -133,7 +133,7 @@ export default function HomePage() {
   async function toggleTask(taskId: string, currentDone: boolean) {
     const newDone = !currentDone;
     const { error } = await supabase
-      .from("daily_tasks")
+      .from("my_build_up_tool_daily_tasks")
       .update({
         done: newDone,
         checked_at: newDone ? new Date().toISOString() : null,
@@ -150,7 +150,7 @@ export default function HomePage() {
 
   async function toggleChecklistItem(itemKey: string) {
     const newChecked = !checklist[itemKey];
-    const { error } = await supabase.from("daily_checklist").upsert(
+    const { error } = await supabase.from("my_build_up_tool_daily_checklist").upsert(
       {
         date_jst: selectedDate,
         item_key: itemKey,
@@ -167,7 +167,7 @@ export default function HomePage() {
 
   async function deleteTask(taskId: string, wasDone: boolean) {
     const { error } = await supabase
-      .from("daily_tasks")
+      .from("my_build_up_tool_daily_tasks")
       .delete()
       .eq("id", taskId);
 
@@ -180,7 +180,7 @@ export default function HomePage() {
   async function updateTask(taskId: string) {
     if (!editText.trim()) return;
     const { error } = await supabase
-      .from("daily_tasks")
+      .from("my_build_up_tool_daily_tasks")
       .update({ task_text: editText.trim() })
       .eq("id", taskId);
 
@@ -198,7 +198,7 @@ export default function HomePage() {
     if (!newTitle.trim()) return;
 
     const { data } = await supabase
-      .from("daily_titles")
+      .from("my_build_up_tool_daily_titles")
       .insert({ date_jst: selectedDate, title: newTitle.trim() })
       .select("id, title")
       .single();
@@ -211,7 +211,7 @@ export default function HomePage() {
 
   async function deleteTitle(titleId: string) {
     const { error } = await supabase
-      .from("daily_titles")
+      .from("my_build_up_tool_daily_titles")
       .delete()
       .eq("id", titleId);
 
@@ -223,7 +223,7 @@ export default function HomePage() {
   async function updateTitle(titleId: string) {
     if (!editTitleText.trim()) return;
     const { error } = await supabase
-      .from("daily_titles")
+      .from("my_build_up_tool_daily_titles")
       .update({ title: editTitleText.trim() })
       .eq("id", titleId);
 
@@ -241,13 +241,13 @@ export default function HomePage() {
   async function toggleRest() {
     if (isRest) {
       await supabase
-        .from("rest_days")
+        .from("my_build_up_tool_rest_days")
         .delete()
         .eq("date_jst", selectedDate);
       setIsRest(false);
     } else {
       await supabase
-        .from("rest_days")
+        .from("my_build_up_tool_rest_days")
         .insert({ date_jst: selectedDate });
       setIsRest(true);
     }
@@ -257,7 +257,7 @@ export default function HomePage() {
     const hoursVal = h === "" ? null : parseInt(h, 10);
     const minsVal = m === "" ? null : parseInt(m, 10);
 
-    await supabase.from("work_hours").upsert(
+    await supabase.from("my_build_up_tool_work_hours").upsert(
       {
         date_jst: selectedDate,
         work_hours_part: hoursVal,
@@ -273,7 +273,7 @@ export default function HomePage() {
     const hoursVal = workHours === "" ? null : parseInt(workHours, 10);
     const minsVal = workMinutes === "" ? null : parseInt(workMinutes, 10);
 
-    await supabase.from("work_hours").upsert(
+    await supabase.from("my_build_up_tool_work_hours").upsert(
       {
         date_jst: selectedDate,
         work_hours_part: hoursVal,

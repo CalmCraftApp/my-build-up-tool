@@ -56,25 +56,25 @@ export default function CalendarPage() {
   const fetchData = useCallback(async () => {
     const [tasksRes, restRes, workRes, titlesRes, checklistRes] = await Promise.all([
       supabase
-        .from("daily_tasks")
+        .from("my_build_up_tool_daily_tasks")
         .select("id, task_text, done, date_jst")
         .gte("date_jst", START_DATE)
         .order("created_at", { ascending: true }),
       supabase
-        .from("rest_days")
+        .from("my_build_up_tool_rest_days")
         .select("date_jst")
         .gte("date_jst", START_DATE),
       supabase
-        .from("work_hours")
+        .from("my_build_up_tool_work_hours")
         .select("date_jst, work_hours_part, work_minutes_part, comment")
         .gte("date_jst", START_DATE),
       supabase
-        .from("daily_titles")
+        .from("my_build_up_tool_daily_titles")
         .select("id, title, date_jst")
         .gte("date_jst", START_DATE)
         .order("created_at", { ascending: true }),
       supabase
-        .from("daily_checklist")
+        .from("my_build_up_tool_daily_checklist")
         .select("date_jst, item_key, checked")
         .gte("date_jst", START_DATE),
     ]);
@@ -153,7 +153,7 @@ export default function CalendarPage() {
   async function toggleTask(taskId: string, currentDone: boolean) {
     const newDone = !currentDone;
     const { error } = await supabase
-      .from("daily_tasks")
+      .from("my_build_up_tool_daily_tasks")
       .update({
         done: newDone,
         checked_at: newDone ? new Date().toISOString() : null,
