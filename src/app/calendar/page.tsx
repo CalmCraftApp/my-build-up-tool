@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { formatDateJST, getTodayJST } from "@/lib/date-utils";
 import { CHECKLIST_ITEMS, CHECKLIST_START_DATE } from "@/lib/checklist-items";
 
@@ -48,47 +47,32 @@ function getDatesFromStartToToday(): string[] {
   return dates;
 }
 
+type RecordsResponse = {
+  tasks: Task[];
+  restDays: { date_jst: string }[];
+  workHours: { date_jst: string; work_hours_part: number | null; work_minutes_part: number | null; comment: string | null }[];
+  titles: Title[];
+  checklist: { date_jst: string; item_key: string; checked: boolean }[];
+};
+
 export default function CalendarPage() {
-  const supabase = createClient();
   const [days, setDays] = useState<DayBlock[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
-    const [tasksRes, restRes, workRes, titlesRes, checklistRes] = await Promise.all([
-      supabase
-        .from("my_build_up_tool_daily_tasks")
-        .select("id, task_text, done, date_jst")
-        .gte("date_jst", START_DATE)
-        .order("created_at", { ascending: true }),
-      supabase
-        .from("my_build_up_tool_rest_days")
-        .select("date_jst")
-        .gte("date_jst", START_DATE),
-      supabase
-        .from("my_build_up_tool_work_hours")
-        .select("date_jst, work_hours_part, work_minutes_part, comment")
-        .gte("date_jst", START_DATE),
-      supabase
-        .from("my_build_up_tool_daily_titles")
-        .select("id, title, date_jst")
-        .gte("date_jst", START_DATE)
-        .order("created_at", { ascending: true }),
-      supabase
-        .from("my_build_up_tool_daily_checklist")
-        .select("date_jst, item_key, checked")
-        .gte("date_jst", START_DATE),
-    ]);
+    const res = await fetch(`/api/records?from=${START_DATE}`);
+    const data: RecordsResponse = await res.json();
 
     const tasksByDate: Record<string, Task[]> = {};
-    for (const t of tasksRes.data ?? []) {
+    for (const t of data.tasks ?? []) {
       if (!tasksByDate[t.date_jst]) tasksByDate[t.date_jst] = [];
       tasksByDate[t.date_jst].push(t);
     }
 
-    const restSet = new Set((restRes.data ?? []).map((r) => r.date_jst));
+    const restSet = new Set((data.restDays ?? []).map((r) => r.date_jst));
 
     const titlesByDate: Record<string, Title[]> = {};
-    for (const t of titlesRes.data ?? []) {
+    for (const t of data.titles ?? []) {
       if (!titlesByDate[t.date_jst]) titlesByDate[t.date_jst] = [];
       titlesByDate[t.date_jst].push(t);
     }
@@ -97,7 +81,7 @@ export default function CalendarPage() {
       string,
       { h: number | null; m: number | null; comment: string | null }
     > = {};
-    for (const w of workRes.data ?? []) {
+    for (const w of data.workHours ?? []) {
       workByDate[w.date_jst] = {
         h: w.work_hours_part,
         m: w.work_minutes_part,
@@ -106,7 +90,7 @@ export default function CalendarPage() {
     }
 
     const checklistByDate: Record<string, Record<string, boolean>> = {};
-    for (const row of checklistRes.data ?? []) {
+    for (const row of data.checklist ?? []) {
       if (!checklistByDate[row.date_jst]) checklistByDate[row.date_jst] = {};
       checklistByDate[row.date_jst][row.item_key] = row.checked;
     }
@@ -144,7 +128,7 @@ export default function CalendarPage() {
 
     setDays(blocks);
     setLoading(false);
-  }, [supabase]);
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -152,15 +136,13 @@ export default function CalendarPage() {
 
   async function toggleTask(taskId: string, currentDone: boolean) {
     const newDone = !currentDone;
-    const { error } = await supabase
-      .from("my_build_up_tool_daily_tasks")
-      .update({
-        done: newDone,
-        checked_at: newDone ? new Date().toISOString() : null,
-      })
-      .eq("id", taskId);
+    const res = await fetch(`/api/tasks/${taskId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ done: newDone }),
+    });
 
-    if (!error) {
+    if (res.ok) {
       setDays((prev) =>
         prev.map((day) => ({
           ...day,

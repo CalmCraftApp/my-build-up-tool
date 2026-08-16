@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { getTodayJST, formatDateJST } from "@/lib/date-utils";
 import { LifeGoals } from "@/components/life-goals";
 import { CHECKLIST_ITEMS, CHECKLIST_START_DATE } from "@/lib/checklist-items";
@@ -23,8 +22,16 @@ type WorkHoursRecord = {
   comment: string | null;
 };
 
+type DayResponse = {
+  tasks: Task[];
+  totalPoints: number;
+  isRest: boolean;
+  workHours: WorkHoursRecord | null;
+  titles: Title[];
+  checklist: { item_key: string; checked: boolean }[];
+};
+
 export default function HomePage() {
-  const supabase = createClient();
   const today = getTodayJST();
 
   const [selectedDate, setSelectedDate] = useState(today);
@@ -45,55 +52,27 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
-    const [tasksRes, pointsRes, restRes, workRes, titlesRes, checklistRes] = await Promise.all([
-      supabase
-        .from("my_build_up_tool_daily_tasks")
-        .select("id, task_text, done")
-        .eq("date_jst", selectedDate)
-        .order("created_at", { ascending: true }),
-      supabase
-        .from("my_build_up_tool_daily_tasks")
-        .select("id", { count: "exact" })
-        .eq("done", true),
-      supabase
-        .from("my_build_up_tool_rest_days")
-        .select("id")
-        .eq("date_jst", selectedDate),
-      supabase
-        .from("my_build_up_tool_work_hours")
-        .select("work_hours_part, work_minutes_part, comment")
-        .eq("date_jst", selectedDate)
-        .single(),
-      supabase
-        .from("my_build_up_tool_daily_titles")
-        .select("id, title")
-        .eq("date_jst", selectedDate)
-        .order("created_at", { ascending: true }),
-      supabase
-        .from("my_build_up_tool_daily_checklist")
-        .select("item_key, checked")
-        .eq("date_jst", selectedDate),
-    ]);
+    const res = await fetch(`/api/day?date=${selectedDate}`);
+    const data: DayResponse = await res.json();
 
-    setTasks(tasksRes.data ?? []);
-    setTotalPoints(pointsRes.count ?? 0);
-    setTitles(titlesRes.data ?? []);
-    setIsRest((restRes.data ?? []).length > 0);
+    setTasks(data.tasks ?? []);
+    setTotalPoints(data.totalPoints ?? 0);
+    setTitles(data.titles ?? []);
+    setIsRest(data.isRest ?? false);
 
     const checklistMap: Record<string, boolean> = {};
     for (const item of CHECKLIST_ITEMS) checklistMap[item.key] = false;
-    for (const row of checklistRes.data ?? []) checklistMap[row.item_key] = row.checked;
+    for (const row of data.checklist ?? []) checklistMap[row.item_key] = row.checked;
     setChecklist(checklistMap);
 
-    if (workRes.data) {
-      const wh = workRes.data as WorkHoursRecord;
-      setWorkHours(wh.work_hours_part?.toString() ?? "");
-      setWorkMinutes(wh.work_minutes_part?.toString() ?? "");
-      setComment(wh.comment ?? "");
+    if (data.workHours) {
+      setWorkHours(data.workHours.work_hours_part?.toString() ?? "");
+      setWorkMinutes(data.workHours.work_minutes_part?.toString() ?? "");
+      setComment(data.workHours.comment ?? "");
     }
 
     setLoading(false);
-  }, [supabase, selectedDate]);
+  }, [selectedDate]);
 
   useEffect(() => {
     fetchData();
@@ -115,16 +94,14 @@ export default function HomePage() {
     e.preventDefault();
     if (!newTask.trim()) return;
 
-    const { data } = await supabase
-      .from("my_build_up_tool_daily_tasks")
-      .insert({
-        date_jst: selectedDate,
-        task_text: newTask.trim(),
-      })
-      .select("id, task_text, done")
-      .single();
+    const res = await fetch("/api/tasks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ date_jst: selectedDate, task_text: newTask.trim() }),
+    });
 
-    if (data) {
+    if (res.ok) {
+      const data = await res.json();
       setTasks((prev) => [...prev, data]);
       setNewTask("");
     }
@@ -132,15 +109,13 @@ export default function HomePage() {
 
   async function toggleTask(taskId: string, currentDone: boolean) {
     const newDone = !currentDone;
-    const { error } = await supabase
-      .from("my_build_up_tool_daily_tasks")
-      .update({
-        done: newDone,
-        checked_at: newDone ? new Date().toISOString() : null,
-      })
-      .eq("id", taskId);
+    const res = await fetch(`/api/tasks/${taskId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ done: newDone }),
+    });
 
-    if (!error) {
+    if (res.ok) {
       setTasks((prev) =>
         prev.map((t) => (t.id === taskId ? { ...t, done: newDone } : t))
       );
@@ -150,28 +125,25 @@ export default function HomePage() {
 
   async function toggleChecklistItem(itemKey: string) {
     const newChecked = !checklist[itemKey];
-    const { error } = await supabase.from("my_build_up_tool_daily_checklist").upsert(
-      {
+    const res = await fetch("/api/checklist", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         date_jst: selectedDate,
         item_key: itemKey,
         checked: newChecked,
-        checked_at: newChecked ? new Date().toISOString() : null,
-      },
-      { onConflict: "date_jst,item_key" }
-    );
+      }),
+    });
 
-    if (!error) {
+    if (res.ok) {
       setChecklist((prev) => ({ ...prev, [itemKey]: newChecked }));
     }
   }
 
   async function deleteTask(taskId: string, wasDone: boolean) {
-    const { error } = await supabase
-      .from("my_build_up_tool_daily_tasks")
-      .delete()
-      .eq("id", taskId);
+    const res = await fetch(`/api/tasks/${taskId}`, { method: "DELETE" });
 
-    if (!error) {
+    if (res.ok) {
       setTasks((prev) => prev.filter((t) => t.id !== taskId));
       if (wasDone) setTotalPoints((prev) => prev - 1);
     }
@@ -179,12 +151,13 @@ export default function HomePage() {
 
   async function updateTask(taskId: string) {
     if (!editText.trim()) return;
-    const { error } = await supabase
-      .from("my_build_up_tool_daily_tasks")
-      .update({ task_text: editText.trim() })
-      .eq("id", taskId);
+    const res = await fetch(`/api/tasks/${taskId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ task_text: editText.trim() }),
+    });
 
-    if (!error) {
+    if (res.ok) {
       setTasks((prev) =>
         prev.map((t) => (t.id === taskId ? { ...t, task_text: editText.trim() } : t))
       );
@@ -197,37 +170,36 @@ export default function HomePage() {
     e.preventDefault();
     if (!newTitle.trim()) return;
 
-    const { data } = await supabase
-      .from("my_build_up_tool_daily_titles")
-      .insert({ date_jst: selectedDate, title: newTitle.trim() })
-      .select("id, title")
-      .single();
+    const res = await fetch("/api/titles", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ date_jst: selectedDate, title: newTitle.trim() }),
+    });
 
-    if (data) {
+    if (res.ok) {
+      const data = await res.json();
       setTitles((prev) => [...prev, data]);
       setNewTitle("");
     }
   }
 
   async function deleteTitle(titleId: string) {
-    const { error } = await supabase
-      .from("my_build_up_tool_daily_titles")
-      .delete()
-      .eq("id", titleId);
+    const res = await fetch(`/api/titles/${titleId}`, { method: "DELETE" });
 
-    if (!error) {
+    if (res.ok) {
       setTitles((prev) => prev.filter((t) => t.id !== titleId));
     }
   }
 
   async function updateTitle(titleId: string) {
     if (!editTitleText.trim()) return;
-    const { error } = await supabase
-      .from("my_build_up_tool_daily_titles")
-      .update({ title: editTitleText.trim() })
-      .eq("id", titleId);
+    const res = await fetch(`/api/titles/${titleId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: editTitleText.trim() }),
+    });
 
-    if (!error) {
+    if (res.ok) {
       setTitles((prev) =>
         prev.map((t) =>
           t.id === titleId ? { ...t, title: editTitleText.trim() } : t
@@ -240,15 +212,14 @@ export default function HomePage() {
 
   async function toggleRest() {
     if (isRest) {
-      await supabase
-        .from("my_build_up_tool_rest_days")
-        .delete()
-        .eq("date_jst", selectedDate);
+      await fetch(`/api/rest-days?date=${selectedDate}`, { method: "DELETE" });
       setIsRest(false);
     } else {
-      await supabase
-        .from("my_build_up_tool_rest_days")
-        .insert({ date_jst: selectedDate });
+      await fetch("/api/rest-days", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date_jst: selectedDate }),
+      });
       setIsRest(true);
     }
   }
@@ -257,32 +228,32 @@ export default function HomePage() {
     const hoursVal = h === "" ? null : parseInt(h, 10);
     const minsVal = m === "" ? null : parseInt(m, 10);
 
-    await supabase.from("my_build_up_tool_work_hours").upsert(
-      {
+    await fetch("/api/work-hours", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         date_jst: selectedDate,
         work_hours_part: hoursVal,
         work_minutes_part: minsVal,
         comment,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "date_jst" }
-    );
+      }),
+    });
   }
 
   async function saveComment(newComment: string) {
     const hoursVal = workHours === "" ? null : parseInt(workHours, 10);
     const minsVal = workMinutes === "" ? null : parseInt(workMinutes, 10);
 
-    await supabase.from("my_build_up_tool_work_hours").upsert(
-      {
+    await fetch("/api/work-hours", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         date_jst: selectedDate,
         work_hours_part: hoursVal,
         work_minutes_part: minsVal,
         comment: newComment,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "date_jst" }
-    );
+      }),
+    });
   }
 
   if (loading) {
