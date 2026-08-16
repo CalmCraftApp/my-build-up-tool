@@ -1,3 +1,9 @@
+-- 注: このアプリはログイン機能がなく auth.uid() は常にNULLのため、
+-- 全テーブルRLSは有効のまま「Allow all」ポリシーで全許可にしている。
+-- (disable row level security はSupabase側で自動的に再有効化されることがあるため使わない)
+-- 将来ログイン機能を追加する場合は、Allow allポリシーを外して
+-- auth.uid() = user_id 方式のポリシーに戻すこと。
+
 -- my_build_up_tool_daily_tasks
 create table my_build_up_tool_daily_tasks (
   id uuid primary key default gen_random_uuid(),
@@ -9,23 +15,12 @@ create table my_build_up_tool_daily_tasks (
   created_at timestamptz not null default now()
 );
 
-alter table my_build_up_tool_daily_tasks disable row level security;
+alter table my_build_up_tool_daily_tasks enable row level security;
 
-create policy "Users can view own tasks"
-  on my_build_up_tool_daily_tasks for select
-  using (auth.uid() = user_id);
-
-create policy "Users can insert own tasks"
-  on my_build_up_tool_daily_tasks for insert
-  with check (auth.uid() = user_id);
-
-create policy "Users can update own tasks"
-  on my_build_up_tool_daily_tasks for update
-  using (auth.uid() = user_id);
-
-create policy "Users can delete own tasks"
-  on my_build_up_tool_daily_tasks for delete
-  using (auth.uid() = user_id);
+create policy "Allow all"
+  on my_build_up_tool_daily_tasks for all
+  using (true)
+  with check (true);
 
 -- my_build_up_tool_rest_days
 create table my_build_up_tool_rest_days (
@@ -35,19 +30,12 @@ create table my_build_up_tool_rest_days (
   created_at timestamptz not null default now()
 );
 
-alter table my_build_up_tool_rest_days disable row level security;
+alter table my_build_up_tool_rest_days enable row level security;
 
-create policy "Users can view own rest days"
-  on my_build_up_tool_rest_days for select
-  using (auth.uid() = user_id);
-
-create policy "Users can insert own rest days"
-  on my_build_up_tool_rest_days for insert
-  with check (auth.uid() = user_id);
-
-create policy "Users can delete own rest days"
-  on my_build_up_tool_rest_days for delete
-  using (auth.uid() = user_id);
+create policy "Allow all"
+  on my_build_up_tool_rest_days for all
+  using (true)
+  with check (true);
 
 -- my_build_up_tool_work_hours
 create table my_build_up_tool_work_hours (
@@ -60,23 +48,14 @@ create table my_build_up_tool_work_hours (
   updated_at timestamptz not null default now()
 );
 
-alter table my_build_up_tool_work_hours disable row level security;
+alter table my_build_up_tool_work_hours enable row level security;
 
-create policy "Users can view own work hours"
-  on my_build_up_tool_work_hours for select
-  using (auth.uid() = user_id);
-
-create policy "Users can insert own work hours"
-  on my_build_up_tool_work_hours for insert
-  with check (auth.uid() = user_id);
-
-create policy "Users can update own work hours"
-  on my_build_up_tool_work_hours for update
-  using (auth.uid() = user_id);
+create policy "Allow all"
+  on my_build_up_tool_work_hours for all
+  using (true)
+  with check (true);
 
 -- my_build_up_tool_daily_checklist
--- 注: このアプリはログイン機能がなく auth.uid() は常にNULLのため、
--- user_id / RLSは付けていない(daily_tasks等の user_id も実際は未使用)。
 create table my_build_up_tool_daily_checklist (
   id uuid primary key default gen_random_uuid(),
   date_jst date not null,
@@ -87,7 +66,12 @@ create table my_build_up_tool_daily_checklist (
   unique (date_jst, item_key)
 );
 
-alter table my_build_up_tool_daily_checklist disable row level security;
+alter table my_build_up_tool_daily_checklist enable row level security;
+
+create policy "Allow all"
+  on my_build_up_tool_daily_checklist for all
+  using (true)
+  with check (true);
 
 -- my_build_up_tool_daily_titles
 create table my_build_up_tool_daily_titles (
