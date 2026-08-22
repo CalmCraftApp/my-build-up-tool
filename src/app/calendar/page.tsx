@@ -2,7 +2,10 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { formatDateJST, getTodayJST } from "@/lib/date-utils";
-import { CHECKLIST_ITEMS, CHECKLIST_START_DATE } from "@/lib/checklist-items";
+import {
+  CHECKLIST_START_DATE,
+  checklistItemsForDate,
+} from "@/lib/checklist-items";
 
 type Task = {
   id: string;
@@ -235,7 +238,7 @@ export default function CalendarPage() {
 
             {day.date >= CHECKLIST_START_DATE && (
               <div className="mt-2 space-y-1">
-                {CHECKLIST_ITEMS.map((item) => {
+                {checklistItemsForDate(day.date).map((item) => {
                   const checked = day.checklist[item.key] ?? false;
                   return (
                     <div key={item.key} className="flex items-center gap-2">

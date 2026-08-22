@@ -3,7 +3,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { getTodayJST, formatDateJST } from "@/lib/date-utils";
 import { LifeGoals } from "@/components/life-goals";
-import { CHECKLIST_ITEMS, CHECKLIST_START_DATE } from "@/lib/checklist-items";
+import {
+  CHECKLIST_ITEMS,
+  CHECKLIST_START_DATE,
+  checklistItemsForDate,
+} from "@/lib/checklist-items";
 
 type Task = {
   id: string;
@@ -434,7 +438,7 @@ export default function HomePage() {
         <div className="space-y-2">
           <h3 className="text-sm font-bold">毎日チェックリスト</h3>
           <div className="rounded border border-gray-200 divide-y divide-gray-100">
-            {CHECKLIST_ITEMS.map((item) => {
+            {checklistItemsForDate(selectedDate).map((item) => {
               const checked = checklist[item.key] ?? false;
               return (
                 <div
