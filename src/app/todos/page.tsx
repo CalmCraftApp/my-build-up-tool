@@ -48,7 +48,7 @@ export default function TodosPage() {
 
     if (res.ok) {
       const data = await res.json();
-      setItems((prev) => [...prev, data]);
+      setItems((prev) => [data, ...prev]);
       setNewText("");
     }
   }

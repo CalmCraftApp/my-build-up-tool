@@ -26,14 +26,14 @@ export async function POST(request: NextRequest) {
 
   const supabase = createAdminClient();
 
-  const { data: maxRow } = await supabase
+  const { data: minRow } = await supabase
     .from("todo_items")
     .select("position")
-    .order("position", { ascending: false })
+    .order("position", { ascending: true })
     .limit(1)
     .maybeSingle();
 
-  const nextPosition = (maxRow?.position ?? -1) + 1;
+  const nextPosition = (minRow?.position ?? 1) - 1;
 
   const { data, error } = await supabase
     .from("todo_items")
