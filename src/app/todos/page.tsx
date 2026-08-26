@@ -160,6 +160,22 @@ export default function TodosPage() {
         </div>
       </div>
 
+      <form onSubmit={addItem} className="flex gap-2">
+        <input
+          type="text"
+          value={newText}
+          onChange={(e) => setNewText(e.target.value)}
+          placeholder="新しいやることを入力..."
+          className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+        />
+        <button
+          type="submit"
+          className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 whitespace-nowrap"
+        >
+          追加
+        </button>
+      </form>
+
       <div className="space-y-2">
         {items.length === 0 && (
           <p className="text-sm text-gray-400">やることがまだありません</p>
@@ -240,22 +256,6 @@ export default function TodosPage() {
           </div>
         ))}
       </div>
-
-      <form onSubmit={addItem} className="flex gap-2">
-        <input
-          type="text"
-          value={newText}
-          onChange={(e) => setNewText(e.target.value)}
-          placeholder="新しいやることを入力..."
-          className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-        />
-        <button
-          type="submit"
-          className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 whitespace-nowrap"
-        >
-          追加
-        </button>
-      </form>
     </div>
   );
 }
