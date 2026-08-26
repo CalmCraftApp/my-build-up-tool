@@ -9,11 +9,15 @@ export const CHECKLIST_ITEMS = [
     startDate: "2026-08-23",
   },
   {
+    key: "relax_energy",
+    label: "ABEMAやTverを観るようにリラックスして50%のエネルギーで事業をすればいい",
+    startDate: "2026-08-27",
+  },
+  {
     key: "ignore_metrics",
     label: "集客数やSNSのいいね数などをいちいち気にしない",
     startDate: "2026-08-23",
   },
-  { key: "wake_5am", label: "朝5時に起きる" },
   { key: "full_effort", label: "マイルールに基づき全力を尽くせたか" },
   { key: "loving", label: "愛ある人間でいれたか" },
   { key: "no_porn", label: "ポルノ断ち" },
