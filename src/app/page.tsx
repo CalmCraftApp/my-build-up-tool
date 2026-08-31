@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { getTodayJST, formatDateJST } from "@/lib/date-utils";
-import { LifeGoals } from "@/components/life-goals";
 import {
   CHECKLIST_ITEMS,
   CHECKLIST_START_DATE,
@@ -370,8 +369,6 @@ export default function HomePage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 space-y-6">
-      <LifeGoals />
-
       <div className="text-center">
         <span className="text-3xl font-bold">累計 {totalPoints}pt</span>
       </div>
