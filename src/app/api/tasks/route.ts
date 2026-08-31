@@ -10,10 +10,21 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = createAdminClient();
+
+  const { data: maxRow } = await supabase
+    .from("daily_tasks")
+    .select("position")
+    .eq("date_jst", date_jst)
+    .order("position", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const nextPosition = (maxRow?.position ?? -1) + 1;
+
   const { data, error } = await supabase
     .from("daily_tasks")
-    .insert({ date_jst, task_text: task_text.trim() })
-    .select("id, task_text, done")
+    .insert({ date_jst, task_text: task_text.trim(), position: nextPosition })
+    .select("id, task_text, done, position")
     .single();
 
   if (error) {

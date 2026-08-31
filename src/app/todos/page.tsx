@@ -218,7 +218,8 @@ export default function TodosPage() {
             ) : (
               <>
                 <span
-                  className={`flex-1 text-sm ${item.done ? "line-through text-gray-400" : ""}`}
+                  draggable={false}
+                  className={`flex-1 text-sm select-text ${item.done ? "line-through text-gray-400" : ""}`}
                 >
                   {item.text}
                 </span>

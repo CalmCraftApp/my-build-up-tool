@@ -24,9 +24,13 @@ create table my_build_up_tool.daily_tasks (
   date_jst date not null,
   task_text text not null,
   done boolean not null default false,
+  position integer not null default 0,
   checked_at timestamptz,
   created_at timestamptz not null default now()
 );
+
+-- 既存DBに対しては下記を実行してカラムを追加すること:
+-- alter table my_build_up_tool.daily_tasks add column if not exists position integer not null default 0;
 
 alter table my_build_up_tool.daily_tasks enable row level security;
 
@@ -91,8 +95,12 @@ create table my_build_up_tool.daily_titles (
   id uuid primary key default gen_random_uuid(),
   date_jst date not null,
   title text not null,
+  position integer not null default 0,
   created_at timestamptz default now()
 );
+
+-- 既存DBに対しては下記を実行してカラムを追加すること:
+-- alter table my_build_up_tool.daily_titles add column if not exists position integer not null default 0;
 
 alter table my_build_up_tool.daily_titles enable row level security;
 

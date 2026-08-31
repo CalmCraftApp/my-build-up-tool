@@ -13,11 +13,13 @@ type Task = {
   id: string;
   task_text: string;
   done: boolean;
+  position: number;
 };
 
 type Title = {
   id: string;
   title: string;
+  position: number;
 };
 
 type WorkHoursRecord = {
@@ -49,6 +51,8 @@ export default function HomePage() {
   const [newTitle, setNewTitle] = useState("");
   const [editingTitleId, setEditingTitleId] = useState<string | null>(null);
   const [editTitleText, setEditTitleText] = useState("");
+  const [dragTaskId, setDragTaskId] = useState<string | null>(null);
+  const [dragTitleId, setDragTitleId] = useState<string | null>(null);
   const [isRest, setIsRest] = useState(false);
   const [workHours, setWorkHours] = useState("");
   const [workMinutes, setWorkMinutes] = useState("");
@@ -170,6 +174,54 @@ export default function HomePage() {
     }
   }
 
+  async function persistTaskOrder(ordered: Task[]) {
+    await fetch("/api/tasks/reorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderedIds: ordered.map((t) => t.id) }),
+    });
+  }
+
+  function moveTask(id: string, direction: -1 | 1) {
+    setTasks((prev) => {
+      const index = prev.findIndex((t) => t.id === id);
+      const targetIndex = index + direction;
+      if (index === -1 || targetIndex < 0 || targetIndex >= prev.length) {
+        return prev;
+      }
+      const updated = [...prev];
+      [updated[index], updated[targetIndex]] = [updated[targetIndex], updated[index]];
+      persistTaskOrder(updated);
+      return updated;
+    });
+  }
+
+  function handleTaskDragStart(id: string) {
+    setDragTaskId(id);
+  }
+
+  function handleTaskDragOver(e: React.DragEvent, overId: string) {
+    e.preventDefault();
+    if (!dragTaskId || dragTaskId === overId) return;
+
+    setTasks((prev) => {
+      const dragIndex = prev.findIndex((t) => t.id === dragTaskId);
+      const overIndex = prev.findIndex((t) => t.id === overId);
+      if (dragIndex === -1 || overIndex === -1) return prev;
+
+      const updated = [...prev];
+      const [moved] = updated.splice(dragIndex, 1);
+      updated.splice(overIndex, 0, moved);
+      return updated;
+    });
+  }
+
+  function handleTaskDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragTaskId(null);
+    persistTaskOrder(tasks);
+  }
+
   async function addTitle(e: React.FormEvent) {
     e.preventDefault();
     if (!newTitle.trim()) return;
@@ -212,6 +264,54 @@ export default function HomePage() {
       setEditingTitleId(null);
       setEditTitleText("");
     }
+  }
+
+  async function persistTitleOrder(ordered: Title[]) {
+    await fetch("/api/titles/reorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderedIds: ordered.map((t) => t.id) }),
+    });
+  }
+
+  function moveTitle(id: string, direction: -1 | 1) {
+    setTitles((prev) => {
+      const index = prev.findIndex((t) => t.id === id);
+      const targetIndex = index + direction;
+      if (index === -1 || targetIndex < 0 || targetIndex >= prev.length) {
+        return prev;
+      }
+      const updated = [...prev];
+      [updated[index], updated[targetIndex]] = [updated[targetIndex], updated[index]];
+      persistTitleOrder(updated);
+      return updated;
+    });
+  }
+
+  function handleTitleDragStart(id: string) {
+    setDragTitleId(id);
+  }
+
+  function handleTitleDragOver(e: React.DragEvent, overId: string) {
+    e.preventDefault();
+    if (!dragTitleId || dragTitleId === overId) return;
+
+    setTitles((prev) => {
+      const dragIndex = prev.findIndex((t) => t.id === dragTitleId);
+      const overIndex = prev.findIndex((t) => t.id === overId);
+      if (dragIndex === -1 || overIndex === -1) return prev;
+
+      const updated = [...prev];
+      const [moved] = updated.splice(dragIndex, 1);
+      updated.splice(overIndex, 0, moved);
+      return updated;
+    });
+  }
+
+  function handleTitleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragTitleId(null);
+    persistTitleOrder(titles);
   }
 
   async function toggleRest() {
@@ -299,7 +399,14 @@ export default function HomePage() {
         {titles.map((t) => (
           <div
             key={t.id}
-            className="flex items-center gap-3 rounded border border-gray-200 px-3 py-2 hover:bg-gray-50"
+            draggable
+            onDragStart={() => handleTitleDragStart(t.id)}
+            onDragOver={(e) => handleTitleDragOver(e, t.id)}
+            onDrop={handleTitleDrop}
+            onDragEnd={handleTitleDrop}
+            className={`flex items-center gap-3 rounded border border-gray-200 px-3 py-2 hover:bg-gray-50 cursor-move ${
+              dragTitleId === t.id ? "opacity-50" : ""
+            }`}
           >
             {editingTitleId === t.id ? (
               <form
@@ -318,19 +425,38 @@ export default function HomePage() {
               </form>
             ) : (
               <>
-                <span className="flex-1 text-sm font-medium">{t.title}</span>
-                <button
-                  onClick={() => { setEditingTitleId(t.id); setEditTitleText(t.title); }}
-                  className="text-xs text-gray-400 hover:text-blue-600"
-                >
-                  編集
-                </button>
-                <button
-                  onClick={() => deleteTitle(t.id)}
-                  className="text-xs text-gray-400 hover:text-red-600"
-                >
-                  削除
-                </button>
+                <span draggable={false} className="flex-1 text-sm font-medium select-text">
+                  {t.title}
+                </span>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => moveTitle(t.id, -1)}
+                    className="text-xs text-gray-400 hover:text-blue-600 px-1"
+                    aria-label="上へ"
+                  >
+                    ▲
+                  </button>
+                  <button
+                    onClick={() => moveTitle(t.id, 1)}
+                    className="text-xs text-gray-400 hover:text-blue-600 px-1"
+                    aria-label="下へ"
+                  >
+                    ▼
+                  </button>
+                  <button
+                    onClick={() => { setEditingTitleId(t.id); setEditTitleText(t.title); }}
+                    className="text-xs text-gray-400 hover:text-blue-600 px-1"
+                  >
+                    編集
+                  </button>
+                  <button
+                    onClick={() => deleteTitle(t.id)}
+                    className="text-xs text-gray-400 hover:text-red-600 px-1"
+                  >
+                    削除
+                  </button>
+                  <span className="text-gray-300 select-none px-1">⠿</span>
+                </div>
               </>
             )}
           </div>
@@ -360,7 +486,14 @@ export default function HomePage() {
         {tasks.map((task) => (
           <div
             key={task.id}
-            className="flex items-center gap-3 rounded border border-gray-200 px-3 py-2 hover:bg-gray-50"
+            draggable
+            onDragStart={() => handleTaskDragStart(task.id)}
+            onDragOver={(e) => handleTaskDragOver(e, task.id)}
+            onDrop={handleTaskDrop}
+            onDragEnd={handleTaskDrop}
+            className={`flex items-center gap-3 rounded border border-gray-200 px-3 py-2 hover:bg-gray-50 cursor-move ${
+              dragTaskId === task.id ? "opacity-50" : ""
+            }`}
           >
             <input
               type="checkbox"
@@ -386,22 +519,40 @@ export default function HomePage() {
             ) : (
               <>
                 <span
-                  className={`flex-1 text-sm ${task.done ? "line-through text-gray-400" : ""}`}
+                  draggable={false}
+                  className={`flex-1 text-sm select-text ${task.done ? "line-through text-gray-400" : ""}`}
                 >
                   {task.task_text}
                 </span>
-                <button
-                  onClick={() => { setEditingId(task.id); setEditText(task.task_text); }}
-                  className="text-xs text-gray-400 hover:text-blue-600"
-                >
-                  編集
-                </button>
-                <button
-                  onClick={() => deleteTask(task.id, task.done)}
-                  className="text-xs text-gray-400 hover:text-red-600"
-                >
-                  削除
-                </button>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => moveTask(task.id, -1)}
+                    className="text-xs text-gray-400 hover:text-blue-600 px-1"
+                    aria-label="上へ"
+                  >
+                    ▲
+                  </button>
+                  <button
+                    onClick={() => moveTask(task.id, 1)}
+                    className="text-xs text-gray-400 hover:text-blue-600 px-1"
+                    aria-label="下へ"
+                  >
+                    ▼
+                  </button>
+                  <button
+                    onClick={() => { setEditingId(task.id); setEditText(task.task_text); }}
+                    className="text-xs text-gray-400 hover:text-blue-600 px-1"
+                  >
+                    編集
+                  </button>
+                  <button
+                    onClick={() => deleteTask(task.id, task.done)}
+                    className="text-xs text-gray-400 hover:text-red-600 px-1"
+                  >
+                    削除
+                  </button>
+                  <span className="text-gray-300 select-none px-1">⠿</span>
+                </div>
               </>
             )}
           </div>

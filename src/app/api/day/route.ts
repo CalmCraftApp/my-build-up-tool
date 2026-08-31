@@ -13,8 +13,9 @@ export async function GET(request: NextRequest) {
     await Promise.all([
       supabase
         .from("daily_tasks")
-        .select("id, task_text, done")
+        .select("id, task_text, done, position")
         .eq("date_jst", date)
+        .order("position", { ascending: true })
         .order("created_at", { ascending: true }),
       supabase.from("daily_tasks").select("id", { count: "exact" }).eq("done", true),
       supabase.from("rest_days").select("id").eq("date_jst", date),
@@ -25,8 +26,9 @@ export async function GET(request: NextRequest) {
         .maybeSingle(),
       supabase
         .from("daily_titles")
-        .select("id, title")
+        .select("id, title, position")
         .eq("date_jst", date)
+        .order("position", { ascending: true })
         .order("created_at", { ascending: true }),
       supabase.from("daily_checklist").select("item_key, checked").eq("date_jst", date),
     ]);
