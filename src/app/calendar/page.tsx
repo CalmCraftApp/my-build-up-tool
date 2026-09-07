@@ -177,6 +177,7 @@ export default function CalendarPage() {
       {days.map((day, index) => {
         const allDone =
           day.tasks.length > 0 && day.tasks.every((t) => t.done);
+        const anyChecklistChecked = Object.values(day.checklist).some(Boolean);
         const dayPoints = day.tasks.filter((t) => t.done).length;
         const cumulativePoints = days
           .slice(index)
@@ -186,6 +187,8 @@ export default function CalendarPage() {
         if (day.isRest) {
           bgClass = "bg-[#ECEFF1]";
         } else if (allDone) {
+          bgClass = "bg-[#E8F5E9]";
+        } else if (anyChecklistChecked) {
           bgClass = "bg-[#E8F5E9]";
         }
 

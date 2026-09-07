@@ -369,6 +369,40 @@ export default function HomePage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 space-y-6">
+      <div className="space-y-1.5 rounded border border-gray-200 px-3 py-2 text-[10px] leading-snug text-gray-600">
+        <div>
+          <p className="font-bold">「ワクワクする目標」</p>
+          <p>2026年12月31日までに計10本リリースして、どうなっているかという未来</p>
+        </div>
+        <div>
+          <p className="font-bold">「ワクワクする戦略」</p>
+          <p>
+            自分自身がワクワクすること・関心があること・興味があること
+            ✕ 多くの人が使っているツールと組み合わせる
+            ✕ 市場性がある(長期的にも)
+            ✕ とりあえず作る・試行回数
+            ✕ データが溜まり、継続して課金されやすい
+            ✕ 生成AIに簡単に乗っ取られない
+            ✕ 独自の世界観
+            ✕ 2週間以内に作る(企画も含めて)
+            ✕ 生成AIAPIとの相性が良い
+          </p>
+        </div>
+        <div>
+          <p className="font-bold">「ワクワクする日々やること」</p>
+          <p>➀企画・サービスの詳細を描く(ここを何となくしない)</p>
+          <p>➁プロンプト作成→実装</p>
+          <p>③動作テスト</p>
+          <p>➃マーケティング(通常動画・ショートを3本ずつ)</p>
+          <p>※➀～④を2週間で終わらせる</p>
+        </div>
+        <div>
+          <p className="font-bold">「別途」</p>
+          <p>検証と説明ができる最低ラインを、実装の都度その場でAIに聞いて身に付ける。何となくは悪。</p>
+          <p>バカ真面目に学ばない。作り、ユーザーを増やし、お金を稼ぐことが最優先。</p>
+        </div>
+      </div>
+
       <div className="text-center">
         <span className="text-3xl font-bold">累計 {totalPoints}pt</span>
       </div>
