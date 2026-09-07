@@ -2,11 +2,6 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { getTodayJST, formatDateJST } from "@/lib/date-utils";
-import {
-  CHECKLIST_ITEMS,
-  CHECKLIST_START_DATE,
-  checklistItemsForDate,
-} from "@/lib/checklist-items";
 
 type Task = {
   id: string;
@@ -33,7 +28,6 @@ type DayResponse = {
   isRest: boolean;
   workHours: WorkHoursRecord | null;
   titles: Title[];
-  checklist: { item_key: string; checked: boolean }[];
 };
 
 export default function HomePage() {
@@ -45,7 +39,6 @@ export default function HomePage() {
   const [newTask, setNewTask] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
-  const [checklist, setChecklist] = useState<Record<string, boolean>>({});
   const [titles, setTitles] = useState<Title[]>([]);
   const [newTitle, setNewTitle] = useState("");
   const [editingTitleId, setEditingTitleId] = useState<string | null>(null);
@@ -67,11 +60,6 @@ export default function HomePage() {
     setTitles(data.titles ?? []);
     setIsRest(data.isRest ?? false);
 
-    const checklistMap: Record<string, boolean> = {};
-    for (const item of CHECKLIST_ITEMS) checklistMap[item.key] = false;
-    for (const row of data.checklist ?? []) checklistMap[row.item_key] = row.checked;
-    setChecklist(checklistMap);
-
     if (data.workHours) {
       setWorkHours(data.workHours.work_hours_part?.toString() ?? "");
       setWorkMinutes(data.workHours.work_minutes_part?.toString() ?? "");
@@ -89,7 +77,6 @@ export default function HomePage() {
     setSelectedDate(date);
     setTasks([]);
     setTitles([]);
-    setChecklist({});
     setIsRest(false);
     setWorkHours("");
     setWorkMinutes("");
@@ -127,23 +114,6 @@ export default function HomePage() {
         prev.map((t) => (t.id === taskId ? { ...t, done: newDone } : t))
       );
       setTotalPoints((prev) => prev + (newDone ? 1 : -1));
-    }
-  }
-
-  async function toggleChecklistItem(itemKey: string) {
-    const newChecked = !checklist[itemKey];
-    const res = await fetch("/api/checklist", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        date_jst: selectedDate,
-        item_key: itemKey,
-        checked: newChecked,
-      }),
-    });
-
-    if (res.ok) {
-      setChecklist((prev) => ({ ...prev, [itemKey]: newChecked }));
     }
   }
 
@@ -615,35 +585,6 @@ export default function HomePage() {
       >
         {isRest ? "休みを解除する" : "今日は休みにする"}
       </button>
-
-      {selectedDate >= CHECKLIST_START_DATE && (
-        <div className="space-y-2">
-          <h3 className="text-sm font-bold">毎日チェックリスト</h3>
-          <div className="rounded border border-gray-200 divide-y divide-gray-100">
-            {checklistItemsForDate(selectedDate).map((item) => {
-              const checked = checklist[item.key] ?? false;
-              return (
-                <div
-                  key={item.key}
-                  onClick={() => toggleChecklistItem(item.key)}
-                  className={`flex items-center gap-3 px-3 py-2 cursor-pointer ${
-                    checked ? "bg-green-50 hover:bg-green-100" : "hover:bg-gray-50"
-                  }`}
-                >
-                  <span
-                    className={`text-2xl font-bold min-w-[20px] text-center ${
-                      checked ? "text-green-500 md:text-4xl" : "text-gray-400"
-                    }`}
-                  >
-                    {checked ? "○" : "✕"}
-                  </span>
-                  <span className="flex-1 text-sm">{item.label}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
       <div className="space-y-3 rounded border border-gray-200 p-4">
         <h3 className="text-sm font-bold">作業時間</h3>

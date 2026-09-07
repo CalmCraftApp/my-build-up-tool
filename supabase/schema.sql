@@ -72,24 +72,6 @@ create policy "Allow all"
   using (true)
   with check (true);
 
--- daily_checklist
-create table my_build_up_tool.daily_checklist (
-  id uuid primary key default gen_random_uuid(),
-  date_jst date not null,
-  item_key text not null,
-  checked boolean not null default false,
-  checked_at timestamptz,
-  created_at timestamptz not null default now(),
-  unique (date_jst, item_key)
-);
-
-alter table my_build_up_tool.daily_checklist enable row level security;
-
-create policy "Allow all"
-  on my_build_up_tool.daily_checklist for all
-  using (true)
-  with check (true);
-
 -- daily_titles
 create table my_build_up_tool.daily_titles (
   id uuid primary key default gen_random_uuid(),

@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
 
   const supabase = createAdminClient();
 
-  const [tasksRes, pointsRes, restRes, workRes, titlesRes, checklistRes] =
+  const [tasksRes, pointsRes, restRes, workRes, titlesRes] =
     await Promise.all([
       supabase
         .from("daily_tasks")
@@ -30,7 +30,6 @@ export async function GET(request: NextRequest) {
         .eq("date_jst", date)
         .order("position", { ascending: true })
         .order("created_at", { ascending: true }),
-      supabase.from("daily_checklist").select("item_key, checked").eq("date_jst", date),
     ]);
 
   return NextResponse.json({
@@ -39,6 +38,5 @@ export async function GET(request: NextRequest) {
     isRest: (restRes.data ?? []).length > 0,
     workHours: workRes.data ?? null,
     titles: titlesRes.data ?? [],
-    checklist: checklistRes.data ?? [],
   });
 }

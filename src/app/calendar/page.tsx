@@ -2,10 +2,6 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { formatDateJST, getTodayJST } from "@/lib/date-utils";
-import {
-  CHECKLIST_START_DATE,
-  checklistItemsForDate,
-} from "@/lib/checklist-items";
 
 type Task = {
   id: string;
@@ -24,7 +20,6 @@ type DayBlock = {
   date: string;
   tasks: Task[];
   titles: Title[];
-  checklist: Record<string, boolean>;
   isRest: boolean;
   workHours: number | null;
   workMinutes: number | null;
@@ -55,7 +50,6 @@ type RecordsResponse = {
   restDays: { date_jst: string }[];
   workHours: { date_jst: string; work_hours_part: number | null; work_minutes_part: number | null; comment: string | null }[];
   titles: Title[];
-  checklist: { date_jst: string; item_key: string; checked: boolean }[];
 };
 
 export default function CalendarPage() {
@@ -92,26 +86,18 @@ export default function CalendarPage() {
       };
     }
 
-    const checklistByDate: Record<string, Record<string, boolean>> = {};
-    for (const row of data.checklist ?? []) {
-      if (!checklistByDate[row.date_jst]) checklistByDate[row.date_jst] = {};
-      checklistByDate[row.date_jst][row.item_key] = row.checked;
-    }
-
     const allDates = getDatesFromStartToToday();
     const blocks: DayBlock[] = [];
 
     for (const date of allDates) {
       const tasks = tasksByDate[date] ?? [];
       const titles = titlesByDate[date] ?? [];
-      const checklist = checklistByDate[date] ?? {};
       const isRest = restSet.has(date);
       const work = workByDate[date];
 
       if (
         tasks.length === 0 &&
         titles.length === 0 &&
-        Object.keys(checklist).length === 0 &&
         !isRest &&
         !work
       )
@@ -121,7 +107,6 @@ export default function CalendarPage() {
         date,
         tasks,
         titles,
-        checklist,
         isRest,
         workHours: work?.h ?? null,
         workMinutes: work?.m ?? null,
@@ -177,7 +162,6 @@ export default function CalendarPage() {
       {days.map((day, index) => {
         const allDone =
           day.tasks.length > 0 && day.tasks.every((t) => t.done);
-        const anyChecklistChecked = Object.values(day.checklist).some(Boolean);
         const dayPoints = day.tasks.filter((t) => t.done).length;
         const cumulativePoints = days
           .slice(index)
@@ -187,8 +171,6 @@ export default function CalendarPage() {
         if (day.isRest) {
           bgClass = "bg-[#ECEFF1]";
         } else if (allDone) {
-          bgClass = "bg-[#E8F5E9]";
-        } else if (anyChecklistChecked) {
           bgClass = "bg-[#E8F5E9]";
         }
 
@@ -236,26 +218,6 @@ export default function CalendarPage() {
                     <span className="text-sm">{task.task_text}</span>
                   </div>
                 ))}
-              </div>
-            )}
-
-            {day.date >= CHECKLIST_START_DATE && (
-              <div className="mt-2 space-y-1">
-                {checklistItemsForDate(day.date).map((item) => {
-                  const checked = day.checklist[item.key] ?? false;
-                  return (
-                    <div key={item.key} className="flex items-center gap-2">
-                      <span
-                        className={`text-sm font-bold min-w-[20px] text-center ${
-                          checked ? "text-green-500 md:text-lg" : "text-gray-400"
-                        }`}
-                      >
-                        {checked ? "○" : "✕"}
-                      </span>
-                      <span className="text-xs text-gray-600">{item.label}</span>
-                    </div>
-                  );
-                })}
               </div>
             )}
 
