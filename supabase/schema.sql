@@ -90,23 +90,3 @@ create policy "Allow all"
   on my_build_up_tool.daily_titles for all
   using (true)
   with check (true);
-
--- todo_items (日付に紐づかない汎用「やること」リスト)
-create table my_build_up_tool.todo_items (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid,
-  text text not null,
-  done boolean not null default false,
-  position integer not null default 0,
-  checked_at timestamptz,
-  created_at timestamptz not null default now()
-);
-
-alter table my_build_up_tool.todo_items enable row level security;
-
-create policy "Allow all"
-  on my_build_up_tool.todo_items for all
-  using (true)
-  with check (true);
-
-grant all on my_build_up_tool.todo_items to anon, authenticated, service_role;
