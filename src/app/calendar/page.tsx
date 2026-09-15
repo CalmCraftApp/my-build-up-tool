@@ -52,9 +52,37 @@ type RecordsResponse = {
   titles: Title[];
 };
 
+function getMonthGrid(year: number, month: number): (string | null)[][] {
+  const firstDay = new Date(year, month - 1, 1);
+  const startWeekday = firstDay.getDay();
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  const cells: (string | null)[] = [];
+  for (let i = 0; i < startWeekday; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push(`${year}-${String(month).padStart(2, "0")}-${String(d).padStart(2, "0")}`);
+  }
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  const weeks: (string | null)[][] = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+  return weeks;
+}
+
+const WEEKDAY_LABELS = ["日", "月", "火", "水", "木", "金", "土"];
+
 export default function CalendarPage() {
   const [days, setDays] = useState<DayBlock[]>([]);
+  const [titlesByDate, setTitlesByDate] = useState<Record<string, Title[]>>({});
+  const [restDates, setRestDates] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
+
+  const today = getTodayJST();
+  const [viewYear, viewMonth] = today.split("-").map(Number);
+  const [view, setView] = useState<{ year: number; month: number }>({
+    year: viewYear,
+    month: viewMonth,
+  });
 
   const fetchData = useCallback(async () => {
     const res = await fetch(`/api/records?from=${START_DATE}`);
@@ -73,6 +101,9 @@ export default function CalendarPage() {
       if (!titlesByDate[t.date_jst]) titlesByDate[t.date_jst] = [];
       titlesByDate[t.date_jst].push(t);
     }
+
+    setTitlesByDate(titlesByDate);
+    setRestDates(restSet);
 
     const workByDate: Record<
       string,
@@ -122,6 +153,21 @@ export default function CalendarPage() {
     fetchData();
   }, [fetchData]);
 
+  function changeMonth(delta: number) {
+    setView((prev) => {
+      let month = prev.month + delta;
+      let year = prev.year;
+      if (month < 1) {
+        month = 12;
+        year -= 1;
+      } else if (month > 12) {
+        month = 1;
+        year += 1;
+      }
+      return { year, month };
+    });
+  }
+
   async function toggleTask(taskId: string, currentDone: boolean) {
     const newDone = !currentDone;
     const res = await fetch(`/api/tasks/${taskId}`, {
@@ -155,6 +201,77 @@ export default function CalendarPage() {
     <div className="mx-auto max-w-3xl px-4 py-6 space-y-4">
       <h1 className="text-lg font-bold">記録</h1>
 
+      <div className="rounded border border-gray-200 p-3">
+        <div className="flex items-center justify-between mb-2">
+          <button
+            onClick={() => changeMonth(-1)}
+            className="text-sm text-gray-500 hover:text-blue-600 px-2"
+          >
+            ◀
+          </button>
+          <span className="font-bold text-sm">
+            {view.year}年{view.month}月
+          </span>
+          <button
+            onClick={() => changeMonth(1)}
+            className="text-sm text-gray-500 hover:text-blue-600 px-2"
+          >
+            ▶
+          </button>
+        </div>
+
+        <div className="grid grid-cols-7 gap-1 text-center text-xs text-gray-400 mb-1">
+          {WEEKDAY_LABELS.map((w) => (
+            <span key={w}>{w}</span>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-7 gap-1">
+          {getMonthGrid(view.year, view.month)
+            .flat()
+            .map((date, i) => {
+              if (!date) return <div key={`empty-${i}`} />;
+
+              const dayNum = Number(date.split("-")[2]);
+              const isToday = date === today;
+              const isRest = restDates.has(date);
+              const titlesForDay = titlesByDate[date] ?? [];
+              const hasRecord = titlesForDay.length > 0 || isRest;
+
+              const cell = (
+                <div
+                  className={`min-h-[56px] rounded border p-1 text-left ${
+                    isRest
+                      ? "bg-[#ECEFF1] border-gray-200"
+                      : "border-gray-100"
+                  } ${isToday ? "ring-2 ring-blue-400" : ""}`}
+                >
+                  <div className="text-[11px] text-gray-400">{dayNum}</div>
+                  {isRest && (
+                    <div className="text-[10px] text-gray-500">休み</div>
+                  )}
+                  {titlesForDay.map((t) => (
+                    <div
+                      key={t.id}
+                      className="text-[10px] leading-tight text-gray-700 break-words"
+                    >
+                      {t.title}
+                    </div>
+                  ))}
+                </div>
+              );
+
+              return hasRecord ? (
+                <a key={date} href={`#day-${date}`}>
+                  {cell}
+                </a>
+              ) : (
+                <div key={date}>{cell}</div>
+              );
+            })}
+        </div>
+      </div>
+
       {days.length === 0 && (
         <p className="text-sm text-gray-400">まだ記録がありません</p>
       )}
@@ -177,7 +294,8 @@ export default function CalendarPage() {
         return (
           <div
             key={day.date}
-            className={`rounded border border-gray-200 p-4 ${bgClass}`}
+            id={`day-${day.date}`}
+            className={`rounded border border-gray-200 p-4 scroll-mt-4 ${bgClass}`}
           >
             <div className="flex items-baseline justify-between mb-2">
               <span className="font-bold text-sm">
