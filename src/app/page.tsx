@@ -342,7 +342,13 @@ export default function HomePage() {
       <div className="space-y-1.5 rounded border border-gray-200 px-3 py-2 text-[10px] leading-snug text-gray-600">
         <div>
           <p className="font-bold">「ワクワクする目標」</p>
-          <p>2026年12月31日までに計10本リリースして、どうなっているかという未来</p>
+          <p>来年4月、響人の入学祝いとして本人に10万円、さらに大阪茨木キャンパスまで来る親の交通費・ホテル代・食事代も含めて合計30万円を自分の事業で用意する</p>
+        </div>
+        <div>
+          <p className="font-bold">「そのための行動」</p>
+          <p>
+            5日に1本のペースで新しいサービスを公開し、各サービスにつき通常動画1本+ショート動画1本を投稿する。課金を狙う、そうでなくても受託開発の窓口として機能させる。
+          </p>
         </div>
         <div>
           <p className="font-bold">「ワクワクする戦略」</p>
@@ -358,14 +364,6 @@ export default function HomePage() {
             ✕ 2週間以内に作る(企画も含めて)
             ✕ 生成AIAPIとの相性が良い
           </p>
-        </div>
-        <div>
-          <p className="font-bold">「ワクワクする日々やること」</p>
-          <p>➀企画・サービスの詳細を描く(ここを何となくしない)</p>
-          <p>➁プロンプト作成→実装</p>
-          <p>③動作テスト</p>
-          <p>➃マーケティング(通常動画1本・ショートを1本ずつ)</p>
-          <p>※➀～④を5日で終わらせる</p>
         </div>
         <div>
           <p className="font-bold">「マインド」</p>
