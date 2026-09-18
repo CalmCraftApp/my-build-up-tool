@@ -15,3 +15,11 @@ export function formatDateJST(dateStr: string): string {
   const dow = DAY_NAMES[date.getDay()];
   return `${y}年${m}月${d}日(${dow})`;
 }
+
+export function getDaysUntilJST(targetDateStr: string): number {
+  const [ty, tm, td] = targetDateStr.split("-").map(Number);
+  const [cy, cm, cd] = getTodayJST().split("-").map(Number);
+  const targetUTC = Date.UTC(ty, tm - 1, td);
+  const currentUTC = Date.UTC(cy, cm - 1, cd);
+  return Math.round((targetUTC - currentUTC) / 86400000);
+}

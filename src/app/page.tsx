@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { getTodayJST, formatDateJST } from "@/lib/date-utils";
+import { getTodayJST, formatDateJST, getDaysUntilJST } from "@/lib/date-utils";
 
 type Task = {
   id: string;
@@ -341,13 +341,13 @@ export default function HomePage() {
     <div className="mx-auto max-w-3xl px-4 py-6 space-y-6">
       <div className="space-y-1.5 rounded border border-gray-200 px-3 py-2 text-[10px] leading-snug text-gray-600">
         <div>
-          <p className="font-bold">「ワクワクする目標」</p>
-          <p>来年4月、響人の入学祝いとして本人に10万円、さらに大阪茨木キャンパスまで来る親の交通費・ホテル代・食事代も含めて合計30万円を自分の事業で用意する</p>
+          <p className="font-bold">「達成した目標」</p>
+          <p>来年4月、響人の入学祝いとして本人に10万円、さらに大阪茨木キャンパスまで来る親の交通費・ホテル代・食事代も含めて合計30万円を自分の事業で用意した</p>
         </div>
         <div>
-          <p className="font-bold">「そのための行動」</p>
+          <p className="font-bold">「そのためにした行動」</p>
           <p>
-            5日に1本のペースで新しいサービスを公開し、各サービスにつき通常動画1本+ショート動画1本を投稿する。課金を狙う、そうでなくても受託開発の窓口として機能させる。
+            5日に1本のペースで新しいサービスを公開し、各サービスにつき通常動画1本+ショート動画1本を投稿する。課金を狙う、そうでなくても受託開発の窓口として機能させた。
           </p>
         </div>
         <div>
@@ -377,8 +377,11 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="text-center">
-        <span className="text-3xl font-bold">累計 {totalPoints}pt</span>
+      <div className="text-center space-y-1">
+        <p className="text-sm font-bold text-gray-600">
+          2027年3月31日まで あと{getDaysUntilJST("2027-03-31")}日
+        </p>
+        <span className="text-3xl font-bold">積上完了 {totalPoints}pt</span>
       </div>
 
       <div className="flex items-center gap-3">
