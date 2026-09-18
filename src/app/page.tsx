@@ -381,7 +381,7 @@ export default function HomePage() {
         <p className="text-sm font-bold text-gray-600">
           2027年3月31日まで あと{getDaysUntilJST("2027-03-31")}日
         </p>
-        <span className="text-3xl font-bold">積上完了 {totalPoints}pt</span>
+        <span className="text-3xl font-bold">{totalPoints}積上完了</span>
       </div>
 
       <div className="flex items-center gap-3">
