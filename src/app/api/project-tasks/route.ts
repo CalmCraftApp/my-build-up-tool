@@ -5,7 +5,9 @@ export async function GET() {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("project_tasks")
-    .select("id, plan_text, impl_status, marketing_status, position")
+    .select(
+      "id, plan_text, impl_status, fix_status, marketing_prep_status, marketing_edit_status, position"
+    )
     .order("position", { ascending: true });
 
   if (error) {
@@ -33,7 +35,9 @@ export async function POST(request: NextRequest) {
   const { data, error } = await supabase
     .from("project_tasks")
     .insert({ plan_text: plan_text?.trim() ?? "", position: nextPosition })
-    .select("id, plan_text, impl_status, marketing_status, position")
+    .select(
+      "id, plan_text, impl_status, fix_status, marketing_prep_status, marketing_edit_status, position"
+    )
     .single();
 
   if (error) {

@@ -96,10 +96,18 @@ create table my_build_up_tool.project_tasks (
   id uuid primary key default gen_random_uuid(),
   plan_text text not null default '',
   impl_status text not null default 'none' check (impl_status in ('none', 'done')),
-  marketing_status text not null default 'none' check (marketing_status in ('none', 'done')),
+  fix_status text not null default 'none' check (fix_status in ('none', 'done')),
+  marketing_prep_status text not null default 'none' check (marketing_prep_status in ('none', 'done')),
+  marketing_edit_status text not null default 'none' check (marketing_edit_status in ('none', 'done')),
   position integer not null default 0,
   created_at timestamptz not null default now()
 );
+
+-- 既存DBに対しては下記を実行してカラムを追加・削除すること:
+-- alter table my_build_up_tool.project_tasks add column if not exists fix_status text not null default 'none' check (fix_status in ('none', 'done'));
+-- alter table my_build_up_tool.project_tasks add column if not exists marketing_prep_status text not null default 'none' check (marketing_prep_status in ('none', 'done'));
+-- alter table my_build_up_tool.project_tasks add column if not exists marketing_edit_status text not null default 'none' check (marketing_edit_status in ('none', 'done'));
+-- alter table my_build_up_tool.project_tasks drop column if exists marketing_status;
 
 alter table my_build_up_tool.project_tasks enable row level security;
 
