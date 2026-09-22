@@ -90,10 +90,10 @@ export default function TasksPage() {
       <h1 className="text-lg font-bold">タスク</h1>
 
       <div className="overflow-x-auto rounded border border-gray-200">
-        <table className="w-full border-collapse text-sm">
+        <table className="w-full table-fixed border-collapse text-sm">
           <thead>
             <tr className="bg-gray-50 text-left text-xs text-gray-500">
-              <th className="border-b border-gray-200 px-3 py-2 font-medium">
+              <th className="border-b border-gray-200 px-3 py-2 font-medium min-w-[160px]">
                 企画+プロンプト作成
               </th>
               <th className="border-b border-gray-200 px-3 py-2 font-medium w-24">
