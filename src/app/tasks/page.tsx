@@ -17,6 +17,8 @@ type ProjectTask = {
 export default function TasksPage() {
   const [rows, setRows] = useState<ProjectTask[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   const fetchData = useCallback(async () => {
     const res = await fetch("/api/project-tasks");
@@ -77,6 +79,35 @@ export default function TasksPage() {
     });
   }
 
+  async function persistOrder(newRows: ProjectTask[]) {
+    await Promise.all(
+      newRows.map((r, i) =>
+        fetch(`/api/project-tasks/${r.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ position: i }),
+        })
+      )
+    );
+  }
+
+  function handleDrop(dropIndex: number) {
+    if (dragIndex === null || dragIndex === dropIndex) {
+      setDragIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    const newRows = [...rows];
+    const [moved] = newRows.splice(dragIndex, 1);
+    newRows.splice(dropIndex, 0, moved);
+
+    setRows(newRows);
+    setDragIndex(null);
+    setDragOverIndex(null);
+    persistOrder(newRows);
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20 text-gray-400">
@@ -90,8 +121,9 @@ export default function TasksPage() {
       <h1 className="text-lg font-bold">タスク</h1>
 
       <div className="overflow-x-auto rounded border border-gray-200">
-        <table className="border-collapse text-sm" style={{ tableLayout: "fixed", width: "624px" }}>
+        <table className="border-collapse text-sm" style={{ tableLayout: "fixed", width: "652px" }}>
           <colgroup>
+            <col style={{ width: "28px" }} />
             <col style={{ width: "192px" }} />
             <col style={{ width: "96px" }} />
             <col style={{ width: "96px" }} />
@@ -101,6 +133,7 @@ export default function TasksPage() {
           </colgroup>
           <thead>
             <tr className="bg-gray-50 text-left text-xs text-gray-500">
+              <th className="border-b border-gray-200" />
               <th className="border-b border-gray-200 px-3 py-2 font-medium">
                 企画+プロンプト作成
               </th>
@@ -120,8 +153,36 @@ export default function TasksPage() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
-              <tr key={row.id} className="border-b border-gray-100">
+            {rows.map((row, index) => (
+              <tr
+                key={row.id}
+                className={`border-b border-gray-100 ${
+                  dragOverIndex === index && dragIndex !== index
+                    ? "bg-blue-50"
+                    : ""
+                }`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOverIndex(index);
+                }}
+                onDragLeave={() => setDragOverIndex((prev) => (prev === index ? null : prev))}
+                onDrop={() => handleDrop(index)}
+              >
+                <td
+                  className="p-0 text-center cursor-grab select-none text-gray-300 hover:text-gray-500"
+                  draggable
+                  onDragStart={(e) => {
+                    setDragIndex(index);
+                    e.dataTransfer.effectAllowed = "move";
+                  }}
+                  onDragEnd={() => {
+                    setDragIndex(null);
+                    setDragOverIndex(null);
+                  }}
+                  aria-label="並び替え"
+                >
+                  ⋮⋮
+                </td>
                 <td className="p-0">
                   <input
                     type="text"
