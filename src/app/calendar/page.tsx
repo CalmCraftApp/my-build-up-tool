@@ -277,8 +277,7 @@ export default function CalendarPage() {
       )}
 
       {days.map((day, index) => {
-        const allDone =
-          day.tasks.length > 0 && day.tasks.every((t) => t.done);
+        const anyDone = day.tasks.some((t) => t.done);
         const dayPoints = day.tasks.filter((t) => t.done).length;
         const cumulativePoints = days
           .slice(index)
@@ -287,7 +286,7 @@ export default function CalendarPage() {
         let bgClass = "";
         if (day.isRest) {
           bgClass = "bg-[#ECEFF1]";
-        } else if (allDone) {
+        } else if (anyDone) {
           bgClass = "bg-[#E8F5E9]";
         }
 
@@ -303,8 +302,8 @@ export default function CalendarPage() {
               </span>
               {!day.isRest && (
                 <span className="text-sm">
-                  <span className="text-red-600 font-bold">{dayPoints}pt</span>
-                  <span className="text-gray-400 ml-2">(累計{cumulativePoints}pt)</span>
+                  <span className="text-red-600 font-bold">{dayPoints}積上</span>
+                  <span className="text-gray-400 ml-2">(累計{cumulativePoints}積上)</span>
                 </span>
               )}
             </div>
