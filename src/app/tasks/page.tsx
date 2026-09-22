@@ -96,16 +96,16 @@ export default function TasksPage() {
               <th className="border-b border-gray-200 px-3 py-2 font-medium">
                 企画+プロンプト作成
               </th>
-              <th className="border-b border-gray-200 px-3 py-2 font-medium w-16">
+              <th className="border-b border-gray-200 px-3 py-2 font-medium w-24">
                 実装
               </th>
-              <th className="border-b border-gray-200 px-3 py-2 font-medium w-16">
+              <th className="border-b border-gray-200 px-3 py-2 font-medium w-24">
                 修正
               </th>
-              <th className="border-b border-gray-200 px-3 py-2 font-medium w-16">
+              <th className="border-b border-gray-200 px-3 py-2 font-medium w-24">
                 マ素材準備
               </th>
-              <th className="border-b border-gray-200 px-3 py-2 font-medium w-16">
+              <th className="border-b border-gray-200 px-3 py-2 font-medium w-24">
                 マ編集完了
               </th>
               <th className="border-b border-gray-200 w-8" />
