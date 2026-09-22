@@ -90,25 +90,33 @@ export default function TasksPage() {
       <h1 className="text-lg font-bold">タスク</h1>
 
       <div className="overflow-x-auto rounded border border-gray-200">
-        <table className="w-full table-fixed border-collapse text-sm">
+        <table className="border-collapse text-sm" style={{ tableLayout: "fixed", width: "624px" }}>
+          <colgroup>
+            <col style={{ width: "192px" }} />
+            <col style={{ width: "96px" }} />
+            <col style={{ width: "96px" }} />
+            <col style={{ width: "96px" }} />
+            <col style={{ width: "96px" }} />
+            <col style={{ width: "32px" }} />
+          </colgroup>
           <thead>
             <tr className="bg-gray-50 text-left text-xs text-gray-500">
-              <th className="border-b border-gray-200 px-3 py-2 font-medium min-w-[160px]">
+              <th className="border-b border-gray-200 px-3 py-2 font-medium">
                 企画+プロンプト作成
               </th>
-              <th className="border-b border-gray-200 px-3 py-2 font-medium w-24">
+              <th className="border-b border-gray-200 px-3 py-2 font-medium">
                 実装
               </th>
-              <th className="border-b border-gray-200 px-3 py-2 font-medium w-24">
+              <th className="border-b border-gray-200 px-3 py-2 font-medium">
                 修正
               </th>
-              <th className="border-b border-gray-200 px-3 py-2 font-medium w-24">
+              <th className="border-b border-gray-200 px-3 py-2 font-medium">
                 マ素材準備
               </th>
-              <th className="border-b border-gray-200 px-3 py-2 font-medium w-24">
+              <th className="border-b border-gray-200 px-3 py-2 font-medium">
                 マ編集完了
               </th>
-              <th className="border-b border-gray-200 w-8" />
+              <th className="border-b border-gray-200" />
             </tr>
           </thead>
           <tbody>
