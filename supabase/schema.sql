@@ -90,3 +90,20 @@ create policy "Allow all"
   on my_build_up_tool.daily_titles for all
   using (true)
   with check (true);
+
+-- project_tasks
+create table my_build_up_tool.project_tasks (
+  id uuid primary key default gen_random_uuid(),
+  plan_text text not null default '',
+  impl_status text not null default 'none' check (impl_status in ('none', 'done')),
+  marketing_status text not null default 'none' check (marketing_status in ('none', 'done')),
+  position integer not null default 0,
+  created_at timestamptz not null default now()
+);
+
+alter table my_build_up_tool.project_tasks enable row level security;
+
+create policy "Allow all"
+  on my_build_up_tool.project_tasks for all
+  using (true)
+  with check (true);

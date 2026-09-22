@@ -29,6 +29,16 @@ export function Nav() {
         >
           記録
         </Link>
+        <Link
+          href="/tasks"
+          className={`text-sm font-medium ${
+            pathname === "/tasks"
+              ? "text-blue-600"
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          タスク
+        </Link>
       </div>
     </nav>
   );
