@@ -108,7 +108,7 @@ export default function TasksPage() {
                 実装
               </th>
               <th className="border-b border-gray-200 px-3 py-2 font-medium">
-                設定～修正完了
+                設定～修正
               </th>
               <th className="border-b border-gray-200 px-3 py-2 font-medium">
                 マ素材準備
