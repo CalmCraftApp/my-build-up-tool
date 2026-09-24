@@ -100,6 +100,8 @@ create table my_build_up_tool.project_tasks (
   marketing_prep_status text not null default 'none' check (marketing_prep_status in ('none', 'done')),
   marketing_edit_status text not null default 'none' check (marketing_edit_status in ('none', 'done')),
   position integer not null default 0,
+  memo1 text not null default '',
+  memo2 text not null default '',
   created_at timestamptz not null default now()
 );
 
@@ -108,6 +110,8 @@ create table my_build_up_tool.project_tasks (
 -- alter table my_build_up_tool.project_tasks add column if not exists marketing_prep_status text not null default 'none' check (marketing_prep_status in ('none', 'done'));
 -- alter table my_build_up_tool.project_tasks add column if not exists marketing_edit_status text not null default 'none' check (marketing_edit_status in ('none', 'done'));
 -- alter table my_build_up_tool.project_tasks drop column if exists marketing_status;
+-- alter table my_build_up_tool.project_tasks add column if not exists memo1 text not null default '';
+-- alter table my_build_up_tool.project_tasks add column if not exists memo2 text not null default '';
 
 alter table my_build_up_tool.project_tasks enable row level security;
 

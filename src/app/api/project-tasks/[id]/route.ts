@@ -14,6 +14,8 @@ export async function PATCH(
     marketing_prep_status,
     marketing_edit_status,
     position,
+    memo1,
+    memo2,
   } = body as {
     plan_text?: string;
     impl_status?: "none" | "done";
@@ -21,6 +23,8 @@ export async function PATCH(
     marketing_prep_status?: "none" | "done";
     marketing_edit_status?: "none" | "done";
     position?: number;
+    memo1?: string;
+    memo2?: string;
   };
 
   const update: Record<string, string | number> = {};
@@ -30,6 +34,8 @@ export async function PATCH(
   if (marketing_prep_status !== undefined) update.marketing_prep_status = marketing_prep_status;
   if (marketing_edit_status !== undefined) update.marketing_edit_status = marketing_edit_status;
   if (position !== undefined) update.position = position;
+  if (memo1 !== undefined) update.memo1 = memo1;
+  if (memo2 !== undefined) update.memo2 = memo2;
 
   if (Object.keys(update).length === 0) {
     return NextResponse.json({ error: "no fields to update" }, { status: 400 });

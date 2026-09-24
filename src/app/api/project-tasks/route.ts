@@ -6,7 +6,7 @@ export async function GET() {
   const { data, error } = await supabase
     .from("project_tasks")
     .select(
-      "id, plan_text, impl_status, fix_status, marketing_prep_status, marketing_edit_status, position"
+      "id, plan_text, impl_status, fix_status, marketing_prep_status, marketing_edit_status, position, memo1, memo2"
     )
     .order("position", { ascending: true });
 
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     .from("project_tasks")
     .insert({ plan_text: plan_text?.trim() ?? "", position: nextPosition })
     .select(
-      "id, plan_text, impl_status, fix_status, marketing_prep_status, marketing_edit_status, position"
+      "id, plan_text, impl_status, fix_status, marketing_prep_status, marketing_edit_status, position, memo1, memo2"
     )
     .single();
 

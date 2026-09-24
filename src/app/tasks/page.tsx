@@ -12,6 +12,8 @@ type ProjectTask = {
   marketing_prep_status: Status;
   marketing_edit_status: Status;
   position: number;
+  memo1: string;
+  memo2: string;
 };
 
 export default function TasksPage() {
@@ -60,6 +62,18 @@ export default function TasksPage() {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ plan_text }),
+    });
+  }
+
+  function updateMemoText(id: string, field: "memo1" | "memo2", value: string) {
+    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, [field]: value } : r)));
+  }
+
+  async function saveMemoText(id: string, field: "memo1" | "memo2", value: string) {
+    await fetch(`/api/project-tasks/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ [field]: value }),
     });
   }
 
@@ -117,11 +131,11 @@ export default function TasksPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6 space-y-4">
+    <div className="mx-auto max-w-6xl px-4 py-6 space-y-4">
       <h1 className="text-lg font-bold">タスク</h1>
 
       <div className="overflow-x-auto rounded border border-gray-200">
-        <table className="border-collapse text-sm" style={{ tableLayout: "fixed", width: "652px" }}>
+        <table className="border-collapse text-sm" style={{ tableLayout: "fixed", width: "972px" }}>
           <colgroup>
             <col style={{ width: "28px" }} />
             <col style={{ width: "192px" }} />
@@ -129,6 +143,8 @@ export default function TasksPage() {
             <col style={{ width: "96px" }} />
             <col style={{ width: "96px" }} />
             <col style={{ width: "96px" }} />
+            <col style={{ width: "180px" }} />
+            <col style={{ width: "180px" }} />
             <col style={{ width: "32px" }} />
           </colgroup>
           <thead>
@@ -148,6 +164,12 @@ export default function TasksPage() {
               </th>
               <th className="border-b border-gray-200 px-3 py-2 font-medium">
                 マ編集完了
+              </th>
+              <th className="border-b border-gray-200 px-3 py-2 font-medium">
+                メモ➀
+              </th>
+              <th className="border-b border-gray-200 px-3 py-2 font-medium">
+                メモ➁
               </th>
               <th className="border-b border-gray-200" />
             </tr>
@@ -271,6 +293,24 @@ export default function TasksPage() {
                     <option value="none"></option>
                     <option value="done">終了</option>
                   </select>
+                </td>
+                <td className="p-0">
+                  <input
+                    type="text"
+                    value={row.memo1}
+                    onChange={(e) => updateMemoText(row.id, "memo1", e.target.value)}
+                    onBlur={(e) => saveMemoText(row.id, "memo1", e.target.value)}
+                    className="w-full px-3 py-2 focus:outline-none focus:bg-blue-50"
+                  />
+                </td>
+                <td className="p-0">
+                  <input
+                    type="text"
+                    value={row.memo2}
+                    onChange={(e) => updateMemoText(row.id, "memo2", e.target.value)}
+                    onBlur={(e) => saveMemoText(row.id, "memo2", e.target.value)}
+                    className="w-full px-3 py-2 focus:outline-none focus:bg-blue-50"
+                  />
                 </td>
                 <td className="p-0 text-center">
                   <button
