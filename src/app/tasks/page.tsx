@@ -2,7 +2,13 @@
 
 import { useEffect, useState, useCallback } from "react";
 
-type Status = "none" | "done";
+type Status = "none" | "in_progress" | "done";
+
+function statusBgClass(status: Status): string {
+  if (status === "done") return "bg-[#E8F5E9]";
+  if (status === "in_progress") return "bg-[#FFF8E1]";
+  return "";
+}
 
 type ProjectTask = {
   id: string;
@@ -214,11 +220,7 @@ export default function TasksPage() {
                     className="w-full px-3 py-2 focus:outline-none focus:bg-blue-50"
                   />
                 </td>
-                <td
-                  className={`p-0 ${
-                    row.impl_status === "done" ? "bg-[#E8F5E9]" : ""
-                  }`}
-                >
+                <td className={`p-0 ${statusBgClass(row.impl_status)}`}>
                   <select
                     value={row.impl_status}
                     onChange={(e) =>
@@ -231,14 +233,11 @@ export default function TasksPage() {
                     className="w-full bg-transparent px-3 py-2 focus:outline-none"
                   >
                     <option value="none"></option>
+                    <option value="in_progress">途中</option>
                     <option value="done">終了</option>
                   </select>
                 </td>
-                <td
-                  className={`p-0 ${
-                    row.fix_status === "done" ? "bg-[#E8F5E9]" : ""
-                  }`}
-                >
+                <td className={`p-0 ${statusBgClass(row.fix_status)}`}>
                   <select
                     value={row.fix_status}
                     onChange={(e) =>
@@ -251,14 +250,11 @@ export default function TasksPage() {
                     className="w-full bg-transparent px-3 py-2 focus:outline-none"
                   >
                     <option value="none"></option>
+                    <option value="in_progress">途中</option>
                     <option value="done">終了</option>
                   </select>
                 </td>
-                <td
-                  className={`p-0 ${
-                    row.marketing_prep_status === "done" ? "bg-[#E8F5E9]" : ""
-                  }`}
-                >
+                <td className={`p-0 ${statusBgClass(row.marketing_prep_status)}`}>
                   <select
                     value={row.marketing_prep_status}
                     onChange={(e) =>
@@ -271,14 +267,11 @@ export default function TasksPage() {
                     className="w-full bg-transparent px-3 py-2 focus:outline-none"
                   >
                     <option value="none"></option>
+                    <option value="in_progress">途中</option>
                     <option value="done">終了</option>
                   </select>
                 </td>
-                <td
-                  className={`p-0 ${
-                    row.marketing_edit_status === "done" ? "bg-[#E8F5E9]" : ""
-                  }`}
-                >
+                <td className={`p-0 ${statusBgClass(row.marketing_edit_status)}`}>
                   <select
                     value={row.marketing_edit_status}
                     onChange={(e) =>
@@ -291,6 +284,7 @@ export default function TasksPage() {
                     className="w-full bg-transparent px-3 py-2 focus:outline-none"
                   >
                     <option value="none"></option>
+                    <option value="in_progress">途中</option>
                     <option value="done">終了</option>
                   </select>
                 </td>

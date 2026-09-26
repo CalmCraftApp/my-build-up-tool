@@ -18,10 +18,10 @@ export async function PATCH(
     memo2,
   } = body as {
     plan_text?: string;
-    impl_status?: "none" | "done";
-    fix_status?: "none" | "done";
-    marketing_prep_status?: "none" | "done";
-    marketing_edit_status?: "none" | "done";
+    impl_status?: "none" | "in_progress" | "done";
+    fix_status?: "none" | "in_progress" | "done";
+    marketing_prep_status?: "none" | "in_progress" | "done";
+    marketing_edit_status?: "none" | "in_progress" | "done";
     position?: number;
     memo1?: string;
     memo2?: string;
