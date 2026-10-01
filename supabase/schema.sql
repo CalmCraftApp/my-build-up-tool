@@ -127,3 +127,20 @@ create policy "Allow all"
   on my_build_up_tool.project_tasks for all
   using (true)
   with check (true);
+
+-- non_business_tasks (タスクページの「事業外」タブ用。日付に紐づかないシンプルなチェックリスト)
+create table my_build_up_tool.non_business_tasks (
+  id uuid primary key default gen_random_uuid(),
+  task_text text not null,
+  done boolean not null default false,
+  position integer not null default 0,
+  checked_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+alter table my_build_up_tool.non_business_tasks enable row level security;
+
+create policy "Allow all"
+  on my_build_up_tool.non_business_tasks for all
+  using (true)
+  with check (true);
