@@ -356,6 +356,10 @@ export default function HomePage() {
           </p>
           <p>➃「ちゃんとしよう」とするから、涙が出るし、イライラするし、焦る。そうじゃなくて「まぁいっか。間違えれば修正すればいい」の気持ちでやることで、結局量と時間を増やせる</p>
         </div>
+        <div>
+          <p className="font-bold">【稼いだ構成】</p>
+          <p>vercel(next.js) + supabase + stripe + claude + gemini + seo + youtube + note + threads + x + instagram</p>
+        </div>
       </div>
 
       <div className="text-center space-y-1">
