@@ -46,6 +46,7 @@ function CopyButton({ value }: { value: string }) {
 export default function PasswordsPage() {
   const [rows, setRows] = useState<PasswordRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dragId, setDragId] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     const res = await fetch("/api/passwords");
@@ -90,6 +91,39 @@ export default function PasswordsPage() {
     });
   }
 
+  async function persistOrder(ordered: PasswordRow[]) {
+    await fetch("/api/passwords/reorder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderedIds: ordered.map((r) => r.id) }),
+    });
+  }
+
+  function handleDragStart(id: string) {
+    setDragId(id);
+  }
+
+  function handleDragOver(e: React.DragEvent, overId: string) {
+    e.preventDefault();
+    if (!dragId || dragId === overId) return;
+
+    setRows((prev) => {
+      const dragIndex = prev.findIndex((r) => r.id === dragId);
+      const overIndex = prev.findIndex((r) => r.id === overId);
+      if (dragIndex === -1 || overIndex === -1) return prev;
+
+      const updated = [...prev];
+      const [moved] = updated.splice(dragIndex, 1);
+      updated.splice(overIndex, 0, moved);
+      return updated;
+    });
+  }
+
+  function handleDrop() {
+    setDragId(null);
+    persistOrder(rows);
+  }
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 space-y-4">
       <h1 className="text-lg font-bold">パスワード</h1>
@@ -107,9 +141,19 @@ export default function PasswordsPage() {
             {rows.map((row) => (
               <div
                 key={row.id}
-                className="rounded border border-gray-200 px-3 py-2 space-y-2"
+                draggable
+                onDragStart={() => handleDragStart(row.id)}
+                onDragOver={(e) => handleDragOver(e, row.id)}
+                onDrop={handleDrop}
+                onDragEnd={handleDrop}
+                className={`rounded border border-gray-200 px-3 py-2 space-y-2 ${
+                  dragId === row.id ? "opacity-50" : ""
+                }`}
               >
                 <div className="flex items-center gap-2">
+                  <span className="cursor-grab select-none text-gray-300 hover:text-gray-500" aria-label="並び替え">
+                    ⠿
+                  </span>
                   <input
                     type="text"
                     value={row.media}
