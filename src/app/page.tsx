@@ -392,7 +392,7 @@ export default function HomePage() {
         </div>
         <div>
           <p className="font-bold">【稼いだ構成】</p>
-          <p>vercel(next.js) + supabase + stripe + claude + gemini + seo + youtube + note + threads + x + instagram</p>
+          <p>vercel(next.js) + supabase + stripe + claude + gemini + seo + note + threads</p>
         </div>
       </div>
 

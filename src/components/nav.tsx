@@ -39,6 +39,13 @@ export function Nav() {
         >
           タスク
         </Link>
+        <a
+          href="/api/export"
+          download
+          className="ml-auto text-sm font-medium text-gray-600 hover:text-gray-900"
+        >
+          ダウンロード
+        </a>
       </div>
     </nav>
   );
