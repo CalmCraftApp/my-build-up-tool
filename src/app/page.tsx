@@ -632,10 +632,8 @@ export default function HomePage() {
             min="0"
             max="24"
             value={workHours}
-            onChange={(e) => {
-              setWorkHours(e.target.value);
-              saveWorkHours(e.target.value, workMinutes);
-            }}
+            onChange={(e) => setWorkHours(e.target.value)}
+            onBlur={(e) => saveWorkHours(e.target.value, workMinutes)}
             placeholder="0"
             className="w-16 rounded border border-gray-300 px-2 py-1 text-sm text-center focus:border-blue-500 focus:outline-none"
           />
@@ -645,10 +643,8 @@ export default function HomePage() {
             min="0"
             max="59"
             value={workMinutes}
-            onChange={(e) => {
-              setWorkMinutes(e.target.value);
-              saveWorkHours(workHours, e.target.value);
-            }}
+            onChange={(e) => setWorkMinutes(e.target.value)}
+            onBlur={(e) => saveWorkHours(workHours, e.target.value)}
             placeholder="0"
             className="w-16 rounded border border-gray-300 px-2 py-1 text-sm text-center focus:border-blue-500 focus:outline-none"
           />
