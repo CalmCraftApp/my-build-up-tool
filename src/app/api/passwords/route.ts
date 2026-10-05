@@ -5,7 +5,7 @@ export async function GET() {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("passwords")
-    .select("id, media, email, password, position")
+    .select("id, media, email, password, note, position")
     .order("position", { ascending: true });
 
   if (error) {
@@ -17,10 +17,11 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
-  const { media, email, password } = body as {
+  const { media, email, password, note } = body as {
     media?: string;
     email?: string;
     password?: string;
+    note?: string;
   };
 
   const supabase = createAdminClient();
@@ -40,9 +41,10 @@ export async function POST(request: NextRequest) {
       media: media?.trim() ?? "",
       email: email?.trim() ?? "",
       password: password ?? "",
+      note: note ?? "",
       position: nextPosition,
     })
-    .select("id, media, email, password, position")
+    .select("id, media, email, password, note, position")
     .single();
 
   if (error) {

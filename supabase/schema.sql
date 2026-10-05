@@ -151,9 +151,13 @@ create table my_build_up_tool.passwords (
   media text not null default '',
   email text not null default '',
   password text not null default '',
+  note text not null default '',
   position integer not null default 0,
   created_at timestamptz not null default now()
 );
+
+-- 既存DBに対しては下記を実行してカラムを追加すること:
+-- alter table my_build_up_tool.passwords add column if not exists note text not null default '';
 
 alter table my_build_up_tool.passwords enable row level security;
 

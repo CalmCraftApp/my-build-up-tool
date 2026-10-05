@@ -7,6 +7,7 @@ type PasswordRow = {
   media: string;
   email: string;
   password: string;
+  note: string;
   position: number;
 };
 
@@ -61,7 +62,7 @@ export default function PasswordsPage() {
     const res = await fetch("/api/passwords", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ media: "", email: "", password: "" }),
+      body: JSON.stringify({ media: "", email: "", password: "", note: "" }),
     });
 
     if (res.ok) {
@@ -77,11 +78,11 @@ export default function PasswordsPage() {
     }
   }
 
-  function updateField(id: string, field: "media" | "email" | "password", value: string) {
+  function updateField(id: string, field: "media" | "email" | "password" | "note", value: string) {
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, [field]: value } : r)));
   }
 
-  async function saveField(id: string, field: "media" | "email" | "password", value: string) {
+  async function saveField(id: string, field: "media" | "email" | "password" | "note", value: string) {
     await fetch(`/api/passwords/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -146,6 +147,16 @@ export default function PasswordsPage() {
                     className="flex-1 rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
                   />
                   <CopyButton value={row.password} />
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={row.note}
+                    onChange={(e) => updateField(row.id, "note", e.target.value)}
+                    onBlur={(e) => saveField(row.id, "note", e.target.value)}
+                    placeholder="補足"
+                    className="flex-1 rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
+                  />
                 </div>
               </div>
             ))}

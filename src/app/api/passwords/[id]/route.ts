@@ -7,10 +7,11 @@ export async function PATCH(
 ) {
   const { id } = await params;
   const body = await request.json();
-  const { media, email, password, position } = body as {
+  const { media, email, password, note, position } = body as {
     media?: string;
     email?: string;
     password?: string;
+    note?: string;
     position?: number;
   };
 
@@ -18,6 +19,7 @@ export async function PATCH(
   if (media !== undefined) update.media = media;
   if (email !== undefined) update.email = email;
   if (password !== undefined) update.password = password;
+  if (note !== undefined) update.note = note;
   if (position !== undefined) update.position = position;
 
   if (Object.keys(update).length === 0) {
