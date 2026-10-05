@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { getTodayJST, formatDateJST, getDaysUntilJST } from "@/lib/date-utils";
+import { getTodayJST, formatDateJST, getDaysUntilJST, addDaysJST } from "@/lib/date-utils";
 
 type Task = {
   id: string;
@@ -45,6 +45,8 @@ export default function HomePage() {
   const [editTitleText, setEditTitleText] = useState("");
   const [dragTaskId, setDragTaskId] = useState<string | null>(null);
   const [dragTitleId, setDragTitleId] = useState<string | null>(null);
+  const [copiedTitleId, setCopiedTitleId] = useState<string | null>(null);
+  const [copiedTaskId, setCopiedTaskId] = useState<string | null>(null);
   const [isRest, setIsRest] = useState(false);
   const [workHours, setWorkHours] = useState("");
   const [workMinutes, setWorkMinutes] = useState("");
@@ -123,6 +125,22 @@ export default function HomePage() {
     if (res.ok) {
       setTasks((prev) => prev.filter((t) => t.id !== taskId));
       if (wasDone) setTotalPoints((prev) => prev - 1);
+    }
+  }
+
+  async function copyTaskToTomorrow(taskText: string, taskId: string) {
+    const tomorrow = addDaysJST(selectedDate, 1);
+    const res = await fetch("/api/tasks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ date_jst: tomorrow, task_text: taskText }),
+    });
+
+    if (res.ok) {
+      setCopiedTaskId(taskId);
+      setTimeout(() => {
+        setCopiedTaskId((prev) => (prev === taskId ? null : prev));
+      }, 1500);
     }
   }
 
@@ -213,6 +231,22 @@ export default function HomePage() {
 
     if (res.ok) {
       setTitles((prev) => prev.filter((t) => t.id !== titleId));
+    }
+  }
+
+  async function copyTitleToTomorrow(titleText: string, titleId: string) {
+    const tomorrow = addDaysJST(selectedDate, 1);
+    const res = await fetch("/api/titles", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ date_jst: tomorrow, title: titleText }),
+    });
+
+    if (res.ok) {
+      setCopiedTitleId(titleId);
+      setTimeout(() => {
+        setCopiedTitleId((prev) => (prev === titleId ? null : prev));
+      }, 1500);
     }
   }
 
@@ -448,6 +482,12 @@ export default function HomePage() {
                   >
                     削除
                   </button>
+                  <button
+                    onClick={() => copyTitleToTomorrow(t.title, t.id)}
+                    className="text-xs text-gray-400 hover:text-blue-600 px-1 whitespace-nowrap"
+                  >
+                    {copiedTitleId === t.id ? "✓ 翌日へ" : "コピー"}
+                  </button>
                   <span className="text-gray-300 select-none px-1">⠿</span>
                 </div>
               </>
@@ -543,6 +583,12 @@ export default function HomePage() {
                     className="text-xs text-gray-400 hover:text-red-600 px-1"
                   >
                     削除
+                  </button>
+                  <button
+                    onClick={() => copyTaskToTomorrow(task.task_text, task.id)}
+                    className="text-xs text-gray-400 hover:text-blue-600 px-1 whitespace-nowrap"
+                  >
+                    {copiedTaskId === task.id ? "✓ 翌日へ" : "コピー"}
                   </button>
                   <span className="text-gray-300 select-none px-1">⠿</span>
                 </div>
