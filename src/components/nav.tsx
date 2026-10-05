@@ -39,6 +39,16 @@ export function Nav() {
         >
           タスク
         </Link>
+        <Link
+          href="/passwords"
+          className={`text-sm font-medium ${
+            pathname === "/passwords"
+              ? "text-blue-600"
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          パスワード
+        </Link>
         <a
           href="/api/export"
           download

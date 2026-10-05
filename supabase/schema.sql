@@ -144,3 +144,20 @@ create policy "Allow all"
   on my_build_up_tool.non_business_tasks for all
   using (true)
   with check (true);
+
+-- passwords (タスクページの右にある「パスワード」タブ用。媒体ごとのメール・パスワード管理)
+create table my_build_up_tool.passwords (
+  id uuid primary key default gen_random_uuid(),
+  media text not null default '',
+  email text not null default '',
+  password text not null default '',
+  position integer not null default 0,
+  created_at timestamptz not null default now()
+);
+
+alter table my_build_up_tool.passwords enable row level security;
+
+create policy "Allow all"
+  on my_build_up_tool.passwords for all
+  using (true)
+  with check (true);
