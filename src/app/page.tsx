@@ -375,20 +375,15 @@ export default function HomePage() {
     <div className="mx-auto max-w-3xl px-4 py-6 space-y-6">
       <div className="space-y-1.5 rounded border border-gray-200 px-3 py-2 text-[10px] leading-snug text-gray-600">
         <div>
-          <p className="font-bold">【私が本当に達成したくて達成したこと】</p>
-          <p>➀自分の事業でまずは月総41万円稼いだ(これがすべての解決策)</p>
-          <p>➁明るく性格が良く、魅力的でセックスの相性が良いパートナーを持った(これをするにはまずは最低限の遊ぶ金を持つ必要がある)</p>
+          <p className="text-base font-bold">楽々販売やKintoneを使っている人がいる</p>
+          <p className="text-base font-bold">＋</p>
+          <p className="text-base font-bold">アナログの現場は無数にある</p>
+          <p className="text-base font-bold">＝</p>
+          <p className="text-base font-bold">重要があるものを作る + きちんと伝える = 課金される</p>
         </div>
         <div>
-          <p className="font-bold">↓そのためにしたこと</p>
-          <p>➀2026年12月31日までに1人の課金者を獲得することのみにフォーカス(最小の一歩)</p>
-          <p>➁やると決めたことをやり切ることのみにフォーカス(最初から多くを稼ごうとしない、焦らない)</p>
-          <p>
-            ③自分の事業に向き合う時間を増やす(作業量だけじゃなく思考量も)
-            AmazonPrime、Abema、youtube、Fanza、SNSの反応、これらを見ている場合じゃない。頭にゴミをためない
-            メジャーリーグ、本物人妻シリーズのみ(3日に1回程度)、はok
-          </p>
-          <p>➃「ちゃんとしよう」とするから、涙が出るし、イライラするし、焦る。そうじゃなくて「まぁいっか。間違えれば修正すればいい」の気持ちでやることで、結局量と時間を増やせる</p>
+          <p className="font-bold">【私に足すと良いもの】</p>
+          <p>大量行動 + 自分の特性に合致 + 稼ぎ続けらる力 + いちいち悩まない</p>
         </div>
       </div>
 
