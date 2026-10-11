@@ -390,14 +390,6 @@ export default function HomePage() {
           </p>
           <p>➃「ちゃんとしよう」とするから、涙が出るし、イライラするし、焦る。そうじゃなくて「まぁいっか。間違えれば修正すればいい」の気持ちでやることで、結局量と時間を増やせる</p>
         </div>
-        <div>
-          <p className="font-bold">【稼いだ構成】</p>
-          <p className="text-base font-bold">楽々販売やKintoneを使っている人がいる</p>
-          <p className="text-base font-bold">＋</p>
-          <p className="text-base font-bold">アナログの現場は無数にある</p>
-          <p className="text-base font-bold">＝</p>
-          <p className="text-base font-bold">重要があるものを作る + きちんと伝える = 課金される</p>
-        </div>
       </div>
 
       <div className="text-center space-y-1">
