@@ -382,8 +382,8 @@ export default function HomePage() {
           <p className="text-base font-bold">重要があるものを作る + きちんと伝える = 課金される</p>
         </div>
         <div>
-          <p className="font-bold">【私に足すと良いもの】</p>
-          <p>大量行動 + 自分の特性に合致 + 稼ぎ続けらる力 + いちいち悩まない</p>
+          <p className="text-base font-bold">【私に足すと良いもの】</p>
+          <p className="text-base font-bold">大量行動 + 自分の特性に合致 + 稼ぎ続けらる力 + いちいち悩まない</p>
         </div>
       </div>
 
