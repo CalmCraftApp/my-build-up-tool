@@ -97,8 +97,8 @@ create table my_build_up_tool.project_tasks (
   plan_text text not null default '',
   impl_status text not null default 'none' check (impl_status in ('none', 'in_progress', 'done')),
   fix_status text not null default 'none' check (fix_status in ('none', 'in_progress', 'done')),
-  marketing_prep_status text not null default 'none' check (marketing_prep_status in ('none', 'in_progress', 'done')),
   marketing_edit_status text not null default 'none' check (marketing_edit_status in ('none', 'in_progress', 'done')),
+  legal_sg_status text not null default 'none' check (legal_sg_status in ('none', 'in_progress', 'done')),
   position integer not null default 0,
   memo1 text not null default '',
   memo2 text not null default '',
@@ -120,6 +120,8 @@ create table my_build_up_tool.project_tasks (
 -- alter table my_build_up_tool.project_tasks add constraint project_tasks_marketing_prep_status_check check (marketing_prep_status in ('none', 'in_progress', 'done'));
 -- alter table my_build_up_tool.project_tasks drop constraint if exists project_tasks_marketing_edit_status_check;
 -- alter table my_build_up_tool.project_tasks add constraint project_tasks_marketing_edit_status_check check (marketing_edit_status in ('none', 'in_progress', 'done'));
+-- alter table my_build_up_tool.project_tasks drop column if exists marketing_prep_status;
+-- alter table my_build_up_tool.project_tasks add column if not exists legal_sg_status text not null default 'none' check (legal_sg_status in ('none', 'in_progress', 'done'));
 
 alter table my_build_up_tool.project_tasks enable row level security;
 

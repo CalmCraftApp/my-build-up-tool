@@ -34,7 +34,7 @@ export async function GET() {
       supabase
         .from("project_tasks")
         .select(
-          "plan_text, impl_status, fix_status, marketing_prep_status, marketing_edit_status, memo1, memo2, position"
+          "plan_text, impl_status, fix_status, marketing_edit_status, legal_sg_status, memo1, memo2, position"
         )
         .order("position", { ascending: true }),
       supabase
@@ -129,9 +129,9 @@ export async function GET() {
     lines.push(
       `   実装:${statusLabel(p.impl_status)} / 設定〜修正:${statusLabel(
         p.fix_status
-      )} / マ素材準備:${statusLabel(
-        p.marketing_prep_status
-      )} / マ編集完了:${statusLabel(p.marketing_edit_status)}`
+      )} / マ完了:${statusLabel(
+        p.marketing_edit_status
+      )} / 法スG設定完了:${statusLabel(p.legal_sg_status)}`
     );
     if (p.memo1) lines.push(`   メモ➀: ${p.memo1}`);
     if (p.memo2) lines.push(`   メモ➁: ${p.memo2}`);

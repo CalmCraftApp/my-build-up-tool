@@ -15,8 +15,8 @@ type ProjectTask = {
   plan_text: string;
   impl_status: Status;
   fix_status: Status;
-  marketing_prep_status: Status;
   marketing_edit_status: Status;
+  legal_sg_status: Status;
   position: number;
   memo1: string;
   memo2: string;
@@ -294,7 +294,7 @@ export default function TasksPage() {
 
   async function updateStatus(
     id: string,
-    field: "impl_status" | "fix_status" | "marketing_prep_status" | "marketing_edit_status",
+    field: "impl_status" | "fix_status" | "marketing_edit_status" | "legal_sg_status",
     value: Status
   ) {
     setRows((prev) =>
@@ -373,14 +373,14 @@ export default function TasksPage() {
       ) : (
       <>
       <div className="overflow-x-auto rounded border border-gray-200">
-        <table className="border-collapse text-sm" style={{ tableLayout: "fixed", width: "972px" }}>
+        <table className="border-collapse text-sm" style={{ tableLayout: "fixed", width: "1020px" }}>
           <colgroup>
             <col style={{ width: "28px" }} />
             <col style={{ width: "192px" }} />
             <col style={{ width: "96px" }} />
             <col style={{ width: "96px" }} />
             <col style={{ width: "96px" }} />
-            <col style={{ width: "96px" }} />
+            <col style={{ width: "120px" }} />
             <col style={{ width: "180px" }} />
             <col style={{ width: "180px" }} />
             <col style={{ width: "32px" }} />
@@ -398,10 +398,10 @@ export default function TasksPage() {
                 設定～修正
               </th>
               <th className="border-b border-gray-200 px-3 py-2 font-medium">
-                マ素材準備
+                マ完了
               </th>
               <th className="border-b border-gray-200 px-3 py-2 font-medium">
-                マ編集完了
+                法スG設定完了
               </th>
               <th className="border-b border-gray-200 px-3 py-2 font-medium">
                 メモ➀
@@ -486,13 +486,13 @@ export default function TasksPage() {
                     <option value="done">終了</option>
                   </select>
                 </td>
-                <td className={`p-0 ${statusBgClass(row.marketing_prep_status)}`}>
+                <td className={`p-0 ${statusBgClass(row.marketing_edit_status)}`}>
                   <select
-                    value={row.marketing_prep_status}
+                    value={row.marketing_edit_status}
                     onChange={(e) =>
                       updateStatus(
                         row.id,
-                        "marketing_prep_status",
+                        "marketing_edit_status",
                         e.target.value as Status
                       )
                     }
@@ -503,13 +503,13 @@ export default function TasksPage() {
                     <option value="done">終了</option>
                   </select>
                 </td>
-                <td className={`p-0 ${statusBgClass(row.marketing_edit_status)}`}>
+                <td className={`p-0 ${statusBgClass(row.legal_sg_status)}`}>
                   <select
-                    value={row.marketing_edit_status}
+                    value={row.legal_sg_status}
                     onChange={(e) =>
                       updateStatus(
                         row.id,
-                        "marketing_edit_status",
+                        "legal_sg_status",
                         e.target.value as Status
                       )
                     }
