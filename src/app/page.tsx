@@ -373,20 +373,6 @@ export default function HomePage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 space-y-6">
-      <div className="space-y-1.5 rounded border border-gray-200 px-3 py-2 text-[10px] leading-snug text-gray-600">
-        <div>
-          <p className="text-base font-bold">楽々販売やKintoneを使っている人がいる</p>
-          <p className="text-base font-bold">＋</p>
-          <p className="text-base font-bold">アナログの現場は無数にある</p>
-          <p className="text-base font-bold">＝</p>
-          <p className="text-base font-bold">重要があるものを作る + きちんと伝える = 課金される</p>
-        </div>
-        <div>
-          <p className="text-base font-bold">【私に足すと良いもの】</p>
-          <p className="text-base font-bold">大量行動 + 自分の特性に合致 + 稼ぎ続けられる仕組み + 悩まずやると決めたらやり切る</p>
-        </div>
-      </div>
-
       <div className="text-center space-y-1">
         <p className="text-sm font-bold text-gray-600">
           2027年3月31日まで あと{getDaysUntilJST("2027-03-31")}日
