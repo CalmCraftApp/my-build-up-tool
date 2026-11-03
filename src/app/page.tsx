@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState, useCallback } from "react";
 import { getTodayJST, formatDateJST, getDaysUntilJST, addDaysJST } from "@/lib/date-utils";
 
@@ -373,6 +374,17 @@ export default function HomePage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 space-y-6">
+      <div className="mx-auto max-w-sm overflow-hidden rounded-lg">
+        <Image
+          src="/images/roadmap.jpeg"
+          alt="ロードマップ"
+          width={2752}
+          height={1536}
+          className="h-auto w-full"
+          priority
+        />
+      </div>
+
       <div className="text-center space-y-1">
         <p className="text-sm font-bold text-gray-600">
           2027年3月31日まで あと{getDaysUntilJST("2027-03-31")}日
